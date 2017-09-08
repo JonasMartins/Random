@@ -8,14 +8,6 @@ public class Servidor {
  {
    ServerSocket servidor = new ServerSocket(12345);
    
-   /** O servidor espera por 3 segundos por uma mensagem 
-   do cliente */
-   try {
-    servidor.setSoTimeout(3);
-   } 
-   catch(SocketException e){
-    e.printStackTrace();
-   }
    System.out.println("Porta 12345 aberta!");
    
    Socket cliente = servidor.accept();
