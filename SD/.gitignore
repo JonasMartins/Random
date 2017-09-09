@@ -1,1 +1,3 @@
 *.class
+tcp/*.class
+tb2/*.class
