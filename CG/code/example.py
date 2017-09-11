@@ -51,8 +51,8 @@ colors = (255,0,0),(255,128,0),(255,255,0),(255,255,255),(0,0,255),(0,255,0)
 cam = Cam((0,0,-5))
 
 # manuseio do mouse para usar no pygame
-pygame.event.get(); pygame.mouse.get_rel()
-pygame.mouse.set_visible(1); pygame.event.set_grab(0)
+# pygame.event.get(); pygame.mouse.get_rel()
+# pygame.mouse.set_visible(1); pygame.event.set_grab(0)
 
 
 # o programa nunca passara de 10 segundos! 
