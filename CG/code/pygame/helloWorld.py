@@ -19,7 +19,6 @@ def game_loop():
   def car(x,y):
     gameDysplay.blit(carImg, (x,y))
 
-
   x = (display_width * 0.45)
   y = (display_height * 0.8)
 
