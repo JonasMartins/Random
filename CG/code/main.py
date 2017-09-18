@@ -15,6 +15,12 @@ RED = (255,0,0)
 
 pygame.init()
 
+def rotate2d(pos,radian):
+    x,y = pos
+    s,c = math.sin(radian),math.cos(radian)
+    return x*c-y*s, y*c-x*s
+
+
 def run():
   
   verts = (-1,-1,-1),(1,-1,-1),(1,1,-1),(-1,1,-1),(-1,-1,1),(1,-1,1),(1,1,1),(-1,1,1)
@@ -22,7 +28,7 @@ def run():
   verts2 = (3,3,3),(5,3,3),(5,5,3),(3,5,3),(3,3,5),(5,3,5),(5,5,5),(3,5,5)
   elapsed = 0
 
-  display_width,display_height = 1100,650
+  display_width,display_height = 1200,600
   cx, cy = display_width//2, display_height//2
 
   scenario = pygame.display.set_mode((display_width,display_height))
@@ -32,20 +38,24 @@ def run():
 
   # game clock
   clock = pygame.time.Clock()
-    
+
   cam = Cam((0,0,-5))
 
-  radian = 0
+  # pygame.event.get()
+  # pygame.mouse.get_rel()
 
+  # radian = 0
   #  program never run more than 20 seconds
   
   while elapsed < 30:
 
     dt = clock.tick(30)
+    key = pygame.key.get_pressed()
 
     # saindo quando fechamos a janela
     for event in pygame.event.get():
       if event.type == pygame.QUIT: pygame.quit(); sys.exit()
+      # cam.events(event)
 
     scenario.fill(BLACK)
 
@@ -57,7 +67,10 @@ def run():
         y-=cam.pos[1]
         z-=cam.pos[2]
 
-        f = 200/(z+0.01)    
+        x,z = rotate2d((x,z),cam.rot[1])
+        y,z = rotate2d((y,z),cam.rot[0])
+
+        f = 300/(z+0.1)    
         x,y = x*f, y*f
         
         # add origem de cada vertice
@@ -67,28 +80,25 @@ def run():
       # Desenhe um segmento de linha reta em uma superfície. Não há tampas de 
       # extremidade, as extremidades são ajustadas para linhas grossas.
       pygame.draw.line(scenario,WHITE,points[0],points[1],1)
-
-    for edge in edges:
-      points2 = []
-      for x,y,z in (verts2[edge[0]],verts2[edge[1]]):
+      # print(points[0],points[1])
+      # print(radian)
+    # for edge in edges:
+    #   points2 = []
+    #   for x,y,z in (verts2[edge[0]],verts2[edge[1]]):
         
-        x-=cam.pos[0]       
-        y-=cam.pos[1]
-        z-=cam.pos[2]
+    #     x-=cam.pos[0]       
+    #     y-=cam.pos[1]
+    #     z-=cam.pos[2]
 
-        f = 200/(z)   
-        x,y = x*f, y*f        
-        points2+=[(cx+int(x), cy+int(y))]
+    #     f = 200/(z)   
+    #     x,y = x*f, y*f        
+    #     points2+=[(cx+int(x), cy+int(y))]
       
-      pygame.draw.line(scenario,RED,points2[0],points2[1],1)
+    #   pygame.draw.line(scenario,RED,points2[0],points2[1],1)
     
     pygame.display.flip()
-
-    key = pygame.key.get_pressed()
     
     cam.update(dt,key)
-
-
 
     elapsed = time() - start
 
