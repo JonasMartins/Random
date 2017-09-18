@@ -37,4 +37,19 @@ class Wireframe:
       print(i, edge.start.x, edge.start.y, edge.start.z)
       print(edge.stop.x, edge.stop.y, edge.stop.z)
 
+  def translate(self, axis, d):
+      """ Add constant 'd' to the coordinate 'axis' of each node of a wireframe """
+      
+      if axis in ['x', 'y', 'z']:
+        for node in self.nodes:
+          setattr(node, axis, getattr(node, axis) + d)
+
+  def scale(self, (centre_x, centre_y), scale):
+    """ Scale the wireframe from the centre of the screen """
+
+    for node in self.nodes:
+      node.x = centre_x + scale * (node.x - centre_x)
+      node.y = centre_y + scale * (node.y - centre_y)
+      node.z *= scale
+
 if __name__ == "__main__": main()
