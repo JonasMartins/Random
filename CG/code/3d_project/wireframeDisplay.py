@@ -9,7 +9,13 @@ key_to_function = {
     pygame.K_DOWN:   (lambda x: x.translateAll('y',  10)),
     pygame.K_UP:     (lambda x: x.translateAll('y', -10)),
     pygame.K_EQUALS: (lambda x: x.scaleAll(1.25)),
-    pygame.K_MINUS:  (lambda x: x.scaleAll( 0.8))}
+    pygame.K_MINUS:  (lambda x: x.scaleAll( 0.8)),
+    pygame.K_q:      (lambda x: x.rotateAll('X',  0.1)),
+    pygame.K_w:      (lambda x: x.rotateAll('X', -0.1)),
+    pygame.K_a:      (lambda x: x.rotateAll('Y',  0.1)),
+    pygame.K_s:      (lambda x: x.rotateAll('Y', -0.1)),
+    pygame.K_z:      (lambda x: x.rotateAll('Z',  0.1)),
+    pygame.K_x:      (lambda x: x.rotateAll('Z', -0.1))}
 
 
 class ProjectionViewer:
@@ -78,9 +84,18 @@ class ProjectionViewer:
         for wireframe in self.wireframes.itervalues():
             wireframe.scale((centre_x, centre_y), scale)
 
+    def rotateAll(self, axis, theta):
+        """ Rotate all wireframe about their centre, along a given axis by a given angle. """
+
+        rotateFunction = 'rotate' + axis
+
+        for wireframe in self.wireframes.itervalues():
+            centre = wireframe.findCentre()
+            getattr(wireframe, rotateFunction)(centre, theta)
+
 
 if __name__ == '__main__':
-    pv = ProjectionViewer(400, 300)
+    pv = ProjectionViewer(1100, 600)
 
     cube = wireframe.Wireframe()
     cube.addNodes([(x,y,z) for x in (50,250) for y in (50,250) for z in (50,250)])
