@@ -1,7 +1,8 @@
 #!/bin/env python
 
-import wireframe as wireframe
+import wireframe as wf
 import pygame
+import numpy as np
 
 key_to_function = {
     pygame.K_LEFT:   (lambda x: x.translateAll('x', -10)),
@@ -16,7 +17,6 @@ key_to_function = {
     pygame.K_s:      (lambda x: x.rotateAll('Y', -0.1)),
     pygame.K_z:      (lambda x: x.rotateAll('Z',  0.1)),
     pygame.K_x:      (lambda x: x.rotateAll('Z', -0.1))}
-
 
 class ProjectionViewer:
     """ Displays 3D objects on a Pygame screen """
@@ -62,12 +62,12 @@ class ProjectionViewer:
 
         for wireframe in self.wireframes.values():
             if self.displayEdges:
-                for edge in wireframe.edges:
-                    pygame.draw.aaline(self.screen, self.edgeColour, (edge.start.x, edge.start.y), (edge.stop.x, edge.stop.y), 1)
+                for n1, n2 in wireframe.edges:
+                    pygame.draw.aaline(self.screen, self.edgeColour, wireframe.nodes[n1][:2], wireframe.nodes[n2][:2], 1)
 
             if self.displayNodes:
                 for node in wireframe.nodes:
-                    pygame.draw.circle(self.screen, self.nodeColour, (int(node.x), int(node.y)), self.nodeRadius, 0)
+                    pygame.draw.circle(self.screen, self.nodeColour, (int(node[0]), int(node[1])), self.nodeRadius, 0)
 
     def translateAll(self, axis, d):
         """ Translate all wireframes along a given axis by d units. """
@@ -93,12 +93,12 @@ class ProjectionViewer:
             centre = wireframe.findCentre()
             getattr(wireframe, rotateFunction)(centre, theta)
 
-
 if __name__ == '__main__':
-    pv = ProjectionViewer(1100, 600)
+    pv = ProjectionViewer(400, 300)
 
-    cube = wireframe.Wireframe()
-    cube.addNodes([(x,y,z) for x in (50,250) for y in (50,250) for z in (50,250)])
+    cube = wf.Wireframe()
+    cube_nodes = [(x,y,z) for x in (50,250) for y in (50,250) for z in (50,250)]
+    cube.addNodes(np.array(cube_nodes))
     cube.addEdges([(n,n+4) for n in range(0,4)]+[(n,n+1) for n in range(0,8,2)]+[(n,n+2) for n in (0,1,4,5)])
     
     pv.addWireframe('cube', cube)
