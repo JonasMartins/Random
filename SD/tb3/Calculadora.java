@@ -1,4 +1,4 @@
-public class Calculadora{
+public class Calculadora {
     int a; int b; int operation;
     double result;
     public Calculadora(int a, int b, int op){
@@ -8,24 +8,25 @@ public class Calculadora{
         runOperation();
     }
 
-    public double runOperation(){
-        switch(this.op){
+    public double runOperation() {
+           
+        switch(this.operation){
             case 1:
-                return a+b
+                this.result =  a+b;
             case 2:
-                return a-b;
+                this.result =  a-b;
             case 3:
-                return a*b;
+                this.result =  a*b;
             case 4:
                 if(b == 0){
                     System.out.println("Division by Zero");
                     System.exit(0);
                 } else {
-                    return a/b;
+                    this.result =  a/b;
                 }
             
         }
-        
+        return result;
     }  
 
 }
