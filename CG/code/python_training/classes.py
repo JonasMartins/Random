@@ -32,6 +32,6 @@ class Duck(Animal):
 def main():
     donald = Duck(color = 'blue')
     # donald = Duck(feet = 2)
-    print(donald.get_varible('color'))
+    print(donald.get_variable('color'))
 
 if __name__ == "__main__": main()
