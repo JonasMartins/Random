@@ -1,0 +1,6 @@
+implentações_para_prova/__pycache__/
+implentações_para_prova/*.pyc
+
+code/*.pyc
+code/3d_project/*.pyc
+python_training/*pyc
