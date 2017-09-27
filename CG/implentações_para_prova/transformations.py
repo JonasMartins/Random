@@ -2,32 +2,31 @@
 # encoding: utf-8
 # 
 
+from matrix_operations import Matrix
+
 class Transformation:
   
   def __init__(self,m1,m2):
-    self.m1 = m1
-    self.m2 = m2
-    self.checkTimes()
+    m1.__class__ = Matrix
+    m2.__class__ = Matrix
+    
+    self.matrix1 = m1 #Matrix(matrix = m1)
+    self.matrix2 = m2 # Matrix(matrix = m2)
+    self.__checkTimes()
 
-  # # checar possibilidade de multiplicaÃ§Ã£o entre as matrizes
-  def checkTimes(self):
-    if(self.getColumns(m1) != self.getRows(m2)):
-      print('ImpossÃ­vel multiplicar as matrizes dadas')
+  # # checar possibilidade de multipliçãoo entre as matrizes
+  def __checkTimes(self):
+    if(self.matrix1.get_columns() != self.matrix2.get_rows()):
+      print('Impossível multiplicar as matrizes dadas')
     return
-
-  def getRows(self,matrix):
-    return len(matrix)
-
-  def getColumns(self,matrix):
-    return len(matrix[0]) 
 
   def timesMetrix(self):
 
-    h = getRows(self.m1)
-    w = getColumns(self.m2)
-    y = getRows(self.m2)
+    h = self.matrix1.get_rows()
+    w = self.matrix2.get_columns()
+    y = self.matrix2.get_rows()
 
-    m3 = allocMatrix(h,w)
+    self.m3 = Matrix(h,w)
 
     for i in range(0,h):
       for j in range(0,w):

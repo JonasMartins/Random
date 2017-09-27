@@ -17,11 +17,11 @@ class Matrix:
     self.variables = kwargs
     
     # para pegar uma matriz de um arquivo texto
-    if(self.variables.has_key('file')):
+    if self.variables.has_key('file'):
       self.__setEnvFile()
     
     # para pegar de um vetor escrito no proprio codigo
-    if(self.variables.has_key('matrix')):
+    if self.variables.has_key('matrix'):
       # m = 
       self.set_variable('columns',len(self.get_variable('matrix')))
       self.set_variable('rows',len(self.get_variable('matrix')[0]))    
@@ -43,13 +43,14 @@ class Matrix:
     self.set_variable('columns',self.__getColumns())
     self.set_variable('rows',self.__getRows())
     self.__allocMatrix()
+    self.__fillMatrix()
 
   # apenas printando as dimensões da matriz, com proṕosito de debug 
   def show_dimensions(self):
     print('{0} x {1}'.format(self.get_variable('rows'),self.get_variable('columns')))
 
   # Percorre a matriz do arquivo e cada item Ã© armazenado na matriz da memÃ³ria
-  def fillMatrix(self):
+  def __fillMatrix(self):
     h = w = 0
     with open(self.get_variable('file')) as m:
        for line in m:
@@ -95,7 +96,7 @@ class Matrix:
 
   # Transformando a matriz do objeto em uma matriz identidade, caso seja axa
   def generate_identity(self):
-    if(self.get_variable('rows') == self.get_variable('columns')):
+    if self.get_variable('rows') == self.get_variable('columns'):
       for i in range(0,self.get_variable('rows')):
         self.get_variable('matrix')[i][i] = 1
 
@@ -114,5 +115,10 @@ class Matrix:
     print('\n********************')
     return
 
+  def get_columns(self):
+    return len(self.get_variable('matrix'))
+  
+  def get_rows(self):
+    return len(self.get_variable('matrix')[0])
 
 if __name__ == "__main__": main()
