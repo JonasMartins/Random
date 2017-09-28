@@ -23,8 +23,8 @@ class Matrix:
     # para pegar de um vetor escrito no proprio codigo
     if self.variables.has_key('matrix'):
       # m = 
-      self.set_variable('columns',len(self.get_variable('matrix')))
-      self.set_variable('rows',len(self.get_variable('matrix')[0]))    
+      self.set_variable('rows',len(self.get_variable('matrix')))
+      self.set_variable('columns',len(self.get_variable('matrix')[0]))    
 
     # para pegar de uma matrix já especificada com rows e columns
     # ela já inicia toda igual a zero 
@@ -102,23 +102,24 @@ class Matrix:
 
   # alocando a matriz na memoria
   def __allocMatrix(self): 
-    m = [[0 for x in range(self.get_variable('rows'))] for y in range(self.get_variable('columns'))]
+    m = [[0 for x in range(self.get_variable('columns'))] for y in range(self.get_variable('rows'))]
     self.set_variable('matrix',m)  
 
   def showMatrix(self):
     print('\n********************')
-    for i in range(0,self.get_variable('columns')):
-      for j in range(0,self.get_variable('rows')):
+    sys.stdout.write('|')
+    for i in range(0,self.get_variable('rows')):
+      for j in range(0,self.get_variable('columns')):
         sys.stdout.write(str(self.get_variable('matrix')[i][j]))
-        sys.stdout.write('-') 
+        sys.stdout.write('|') 
       print('')
     print('\n********************')
     return
 
-  def get_columns(self):
+  def get_rows(self):
     return len(self.get_variable('matrix'))
   
-  def get_rows(self):
+  def get_columns(self):
     return len(self.get_variable('matrix')[0])
 
 if __name__ == "__main__": main()

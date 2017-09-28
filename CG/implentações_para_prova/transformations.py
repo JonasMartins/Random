@@ -6,10 +6,7 @@ import math
 class Transformation:
   
   def __init__(self,alfa,translation,scale,theta):
-
-    if theta is None:
-      theta = 0
-      
+    
     self.alfa = alfa
     # translação é apenas um vetor comum como uma lista
     self.trans = translation
