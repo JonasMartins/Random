@@ -3,14 +3,58 @@
 
   
 # PRODUTO VETORIAL USANDO NUMPY https://docs.scipy.org/doc/numpy-dev/user/quickstart.html
-# import numpy as np
-# a = np.array([1,0,0])  
-# b = np.array([0,1,0])  
-# print np.cross(a,b)
+
 import sys
+import numpy as np
 from transformations import Transformation
 from matrix import Matrix
 
+
+def main():
+
+  
+  v_trans = [-1,-1,-1]
+  v_scale = [2,2,2]
+
+
+  v = [[-3,12,-7,1]]
+
+  mx = [[12,7,3,0],
+  			[4,5,6,0],
+  			[7,8,9,0],
+  			[0,0,0,1]]
+
+  # m = Matrix(matrix = v)
+  # m1 = Matrix(matrix = mx)
+
+  cisalhamento = Transformation(30,[0,0,0],[0,0,0],0).get_matrix(0)
+  translacao = Transformation(0,v_trans,[0,0,0],0).get_matrix(6)
+  scala = Transformation(0,[0,0,0],v_scale,0).get_matrix(7)
+  rotacao = Transformation(0,[0,0,0],[0,0,0],45).get_matrix(9)
+  espelho = Transformation(0,[0,0,0],[0,0,0],0).get_matrix(11)
+  
+
+  # aux = Matrix(matrix = rotacao)
+  # mfinal = timesMetrix(m,aux,None)
+  # mfinal.showMatrix()
+
+  m = np.array(v) 
+  n = np.array(espelho)
+
+  # multiplicação de matrizes numpy
+  print m
+  print '----------------------------'
+  print n
+  print '----------------------------'
+  
+  # mutiplicar por escalar 
+  print np.dot(m,10)
+
+
+
+if __name__ == "__main__": main()
+
+"""
 
 def checkTimes(matrix1,matrix2):
   if matrix1.get_columns() != matrix2.get_rows():
@@ -40,37 +84,4 @@ def timesMetrix(m1,m2,scalar):
           m3.get_variable('matrix')[i][j] += m1.get_variable('matrix')[i][k] * m2.get_variable('matrix')[k][j]
   return m3
 
-def main():
-
-	v_trans = [-1,-1,-1]
-	v_scale = [2,2,2]
-
-
-	v = [[-3,12,-7,1]]
-
-	mx = [[12,7,3,0],
-				[4,5,6,0],
-				[7,8,9,0],
-				[0,0,0,1]]
-	
-	m = Matrix(matrix = v)
-	m1 = Matrix(matrix = mx)
-	cisalhamento = Transformation(30,[0,0,0],[0,0,0],0).get_matrix(0)
-	translacao = Transformation(0,v_trans,[0,0,0],0).get_matrix(6)
-	scala = Transformation(0,[0,0,0],v_scale,0).get_matrix(7)
-	rotacao = Transformation(0,[0,0,0],[0,0,0],45).get_matrix(9)
-	
-	aux = Matrix(matrix = rotacao)
-
-	# m.show_dimensions()
-	# m1.show_dimensions()
-	mfinal = timesMetrix(m,aux,None)
-	# mfinal.show_dimensions()
-	mfinal.showMatrix()
-
-	# for i in range(0,len(v)):
-	# 	for j in range(0,len(mx[0])):
-	# 		for k in range(0,len(mx)):
-	# 			print('r[{}][{}] += :{} * {}'.format(i,j,v[i][k],mx[k][j])) 
-
-if __name__ == "__main__": main()
+  """
