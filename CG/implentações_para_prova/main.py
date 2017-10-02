@@ -6,10 +6,17 @@
 
 import sys
 import numpy as np
-from transformations import Transformation
 from matrix import Matrix
+from numpy import linalg as la
+from transformations import Transformation
 
 
+def normalize(matrix):
+  n = la.norm(matrix)
+  for i in range(0,matrix.shape[0]):
+    for j in range(0,matrix.shape[1]):
+      print '{0}' .format(matrix[i][j] / float(n))
+  
 def main():
 
   
@@ -48,8 +55,17 @@ def main():
   print '----------------------------'
   
   # mutiplicar por escalar 
-  print np.dot(m,10)
+  result =  np.dot(m,10)
 
+  # norma de um vetor 
+  print 'result: {0} norm: {1}' .format(result,la.norm(result))
+  normalize(result)
+
+  # normalizando na classe matrix
+  # print r.get_variable('norm')
+  #norma = np.array(r.get_variable('normalized'))
+
+  #print norma
 
 
 if __name__ == "__main__": main()
