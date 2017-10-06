@@ -24,12 +24,19 @@ def main():
   v_scale = [2,2,2]
 
 
-  v = [[-3,12,-7,1]]
+  v = np.array([[220,290,0,1]])
+  vv = np.array([[-220,-290,0,1]])
+  
+  v = [[1,0,0,-220],
+        [0,1,0,-290],
+        [0,1,0,0],
+        [0,0,0,1]]
 
-  mx = [[12,7,3,0],
-  			[4,5,6,0],
-  			[7,8,9,0],
+  mx = [[-0.9164,0,-0.43664,220],
+  			[0,1,0,0],
+  			[-0.43664,0,0.89974,290],
   			[0,0,0,1]]
+
 
   # m = Matrix(matrix = v)
   # m1 = Matrix(matrix = mx)
@@ -37,29 +44,32 @@ def main():
   cisalhamento = Transformation(30,[0,0,0],[0,0,0],0).get_matrix(0)
   translacao = Transformation(0,v_trans,[0,0,0],0).get_matrix(6)
   scala = Transformation(0,[0,0,0],v_scale,0).get_matrix(7)
-  rotacao = Transformation(0,[0,0,0],[0,0,0],45).get_matrix(9)
+  rotacao = Transformation(0,[0,0,0],[0,0,0],270).get_matrix(9)
   espelho = Transformation(0,[0,0,0],[0,0,0],0).get_matrix(11)
-  
-
+  #print rotacao
+  # final =  np.dot(mx,rotacao)
+  # print np.dot(final,v)
   # aux = Matrix(matrix = rotacao)
   # mfinal = timesMetrix(m,aux,None)
   # mfinal.showMatrix()
+  print np.dot(v,mx)
 
-  m = np.array(v) 
-  n = np.array(espelho)
+  # m = np.array(v) 
+  # n = np.array(espelho)
 
-  # multiplicação de matrizes numpy
-  print m
-  print '----------------------------'
-  print n
-  print '----------------------------'
+  # # multiplicação de matrizes numpy
+  # print m
+  # print '----------------------------'
+  # print n
+  # print '----------------------------'
   
-  # mutiplicar por escalar 
-  result =  np.dot(m,10)
-
-  # norma de um vetor 
-  print 'result: {0} norm: {1}' .format(result,la.norm(result))
-  normalize(result)
+  # # mutiplicar por escalar 
+  # result =  np.dot(m,10)
+  
+  
+  # # norma de um vetor 
+  # print 'result: {0} norm: {1}' .format(result,la.norm(result))
+  # normalize(result)
 
   # normalizando na classe matrix
   # print r.get_variable('norm')
