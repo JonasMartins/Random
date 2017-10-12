@@ -6,17 +6,34 @@
 
 import sys
 import numpy as np
+import math
 from matrix import Matrix
 from numpy import linalg as la
 from transformations import Transformation
 
+# retorna o quartenio baseado no eixo a ser rotacionado
+def quaternion(v,theta):
+  # vv é meu eixo normalizado 
+  vv = v/la.norm(v)
+  t = theta/2
+  q = np.array([[math.cos(t),
+    (vv[0][0] * math.sin(t)),
+    (vv[0][1] * math.sin(t)),
+    (vv[0][2] * math.sin(t))]]) 
+  return q
 
-def normalize(matrix):
-  n = la.norm(matrix)
-  for i in range(0,matrix.shape[0]):
-    for j in range(0,matrix.shape[1]):
-      print '{0}' .format(matrix[i][j] / float(n))
-  
+# retorna o inverso de um quaternio
+def quaternion_i(q):
+  qq = [[q[0][0],0,0,0]]
+  qq[0][1] = q[0][1] * (-1) 
+  qq[0][2] = q[0][2] * (-1)
+  qq[0][3] = q[0][3] * (-1)
+  return qq
+
+def run_quaternion(u,q,q_i):
+  a = np.dot(q,u)
+  return np.dot(q_i,a[0][0])
+
 def main():
 
   
@@ -41,18 +58,21 @@ def main():
   # m = Matrix(matrix = v)
   # m1 = Matrix(matrix = mx)
 
-  cisalhamento = Transformation(30,[0,0,0],[0,0,0],0).get_matrix(0)
-  translacao = Transformation(0,v_trans,[0,0,0],0).get_matrix(6)
-  scala = Transformation(0,[0,0,0],v_scale,0).get_matrix(7)
-  rotacao = Transformation(0,[0,0,0],[0,0,0],270).get_matrix(9)
-  espelho = Transformation(0,[0,0,0],[0,0,0],0).get_matrix(11)
-  #print rotacao
-  # final =  np.dot(mx,rotacao)
-  # print np.dot(final,v)
-  # aux = Matrix(matrix = rotacao)
-  # mfinal = timesMetrix(m,aux,None)
-  # mfinal.showMatrix()
-  print np.dot(v,mx)
+  # cisalhamento = Transformation(30,[0,0,0],[0,0,0],0).get_matrix(0)
+  # translacao = Transformation(0,v_trans,[0,0,0],0).get_matrix(6)
+  # scala = Transformation(0,[0,0,0],v_scale,0).get_matrix(7)
+  # rotacao = Transformation(0,[0,0,0],[0,0,0],270).get_matrix(9)
+  # espelho = Transformation(0,[0,0,0],[0,0,0],0).get_matrix(11)
+
+  axis = np.array([[1,1,1,0]])
+  vector = np.array([[7],[2],[5],[0]])
+
+  q =  quaternion(axis,240)
+  qq = np.array(quaternion_i(q))
+  # print q
+  # print qq
+
+  print run_quaternion(vector,q,qq)
 
   # m = np.array(v) 
   # n = np.array(espelho)
@@ -79,35 +99,3 @@ def main():
 
 
 if __name__ == "__main__": main()
-
-"""
-
-def checkTimes(matrix1,matrix2):
-  if matrix1.get_columns() != matrix2.get_rows():
-    print('Impossível multiplicar as matrizes dadas')
-    sys.exit()
-  return
-
-def timesMetrix(m1,m2,scalar):
-  m3 = None
-  if scalar is not None:
-    m3 = Matrix(rows = m1.get_rows(),columns = m1.get_columns())
-    for i in range(0,m3.get_variable('columns')):
-      for j in range(0,m3.get_variable('rows')): 
-        m3.get_variable('matrix')[i][j] = m1.get_variable('matrix')[i][j] * scalar
-
-  else:
-    checkTimes(m1,m2)
-    
-    h = m1.get_rows()
-    w = m2.get_columns()
-    y = m2.get_rows()
-
-    m3 = Matrix(rows = h,columns = w)
-    for i in range(0,h): 
-      for j in range(0,w): 
-        for k in range(0,y): 
-          m3.get_variable('matrix')[i][j] += m1.get_variable('matrix')[i][k] * m2.get_variable('matrix')[k][j]
-  return m3
-
-  """
