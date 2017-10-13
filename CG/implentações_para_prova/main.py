@@ -16,10 +16,14 @@ def quaternion(v,theta):
   # vv é meu eixo normalizado 
   vv = v/la.norm(v)
   t = theta/2
-  q = np.array([[math.cos(t),
-    (vv[0][0] * math.sin(t)),
-    (vv[0][1] * math.sin(t)),
-    (vv[0][2] * math.sin(t))]]) 
+  q = np.array([ [
+      math.cos(t),
+      (vv[0][0] * math.sin(t)),
+      (vv[0][1] * math.sin(t)),
+      (vv[0][2] * math.sin(t))
+    ] ]
+
+    ) 
   return q
 
 # # retorna o inverso de um quaternio
@@ -34,10 +38,10 @@ def run_quaternion(u,q):
   x = q[0][0]; y = q[0][1]; z = q[0][2]; w = q[0][3]
   m = [
   [ (math.pow(w,2) + math.pow(x,2)) - (math.pow(y,2) - math.pow(z,2)),
-    (2*x*y) - (2*w*z), (2*x*z) + (2*w*y), 0 ],
-  [(2*x*y) + (2*w*z), (math.pow(w,2) - math.pow(x,2)) + (math.pow(y,2) - math.pow(z,2)),
-  (2*y*z) - (2*w*x),0],
-  [(2*x*z) - (2*w*y), (2*y*z) + (2*w*x), (math.pow(w,2) - math.pow(x,2)) - (math.pow(y,2) + math.pow(z,2)),0],
+    (2*(x*y)) - (2*(w*z)), (2*(x*z)) + (2*(w*y)), 0 ],
+  [(2*(x*y)) + (2*(w*z)), (math.pow(w,2) - math.pow(x,2)) + (math.pow(y,2) - math.pow(z,2)),
+  (2*(y*z)) - (2*(w*x)),0],
+  [(2*(x*z)) - (2*(w*y)), (2*(y*z)) + (2*(w*x)), (math.pow(w,2) - math.pow(x,2)) - (math.pow(y,2) + math.pow(z,2)),0],
   [0,0,0,(math.pow(w,2) + math.pow(x,2)) + (math.pow(y,2) + math.pow(z,2))]
   ]
   return m
@@ -64,16 +68,14 @@ def main():
   # rotacao = Transformation(0,[0,0,0],[0,0,0],270).get_matrix(9)
   # espelho = Transformation(0,[0,0,0],[0,0,0],0).get_matrix(11)
 
-  axis = np.array([[7.776,-9.077,-7.569,0]])
-  vector = np.array([[3.836],[11.37],[20.319],[1]])
+  axis = np.array([[2.88,-5,2.88,0]])
+  vector = np.array([[2.88],[0],[-11.18],[1]])
 
-  # q =  quaternion(axis,90)
-
+  q =  quaternion(axis,90)
   # vv = vector/la.norm(vector)
 
-  # m = run_quaternion(vector,q)
-  
-  m = np.array(translacao)
+  m = run_quaternion(vector,q)
+  # m = np.array(translacao)
 
   print np.dot(m,vector)
   
