@@ -10,8 +10,7 @@ def testWireframe():
     
     # Create a triangle by explictly passing the nodes and edges
     print "\nTriangle"
-    triangle = wf.Wireframe()
-    triangle.addNodes([[100,200,10], [200,200,10], [125,100,500]])
+    triangle = wf.Wireframe([[100,200,10], [200,200,10], [125,100,500]])
     triangle.addEdges([(0,1), (1,2), (2,0)])
     triangle.output()
     
@@ -87,7 +86,7 @@ def testSurfaceDisplayWithSphere():
     """ Create and display a cube with surfaces. """
     
     viewer = wd.WireframeViewer(600, 400)
-    viewer.addWireframe('sphere', shape.Spheroid((200,200, 20), (160,160,160), resolution=50))
+    viewer.addWireframe('sphere', shape.Spheroid((200,200, 20), (160,160,160), resolution=30))
     print "Create a sphere with %d faces." % len(viewer.wireframes['sphere'].faces)
     viewer.displayEdges = False
     viewer.run()
@@ -129,5 +128,4 @@ def chooseExample():
             exec("%s()" % examples[choice-1])
     
 if __name__ == '__main__':
-    # testWireframeDisplay3()
-    testSurfaceDisplayWithCube()
+    chooseExample()
