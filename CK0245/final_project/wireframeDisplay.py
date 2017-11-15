@@ -3,7 +3,7 @@ import numpy as np
 import wireframe as wf
 
 # Radian rotated by a key event
-ROTATION_AMOUNT = np.pi/16
+ROTATION_AMOUNT = np.pi/32
 MOVEMENT_AMOUNT = 10
 
 key_to_function = {
@@ -20,7 +20,7 @@ key_to_function = {
     pygame.K_z:      (lambda x: x.rotate('z', ROTATION_AMOUNT)),
     pygame.K_x:      (lambda x: x.rotate('z',-ROTATION_AMOUNT))
 }
-
+"""
 light_movement = {
     pygame.K_q:      (lambda x: x.transform(wf.rotateXMatrix(-ROTATION_AMOUNT))),
     pygame.K_w:      (lambda x: x.transform(wf.rotateXMatrix( ROTATION_AMOUNT))),
@@ -29,7 +29,7 @@ light_movement = {
     pygame.K_z:      (lambda x: x.transform(wf.rotateZMatrix(-ROTATION_AMOUNT))),
     pygame.K_x:      (lambda x: x.transform(wf.rotateZMatrix( ROTATION_AMOUNT)))
 }
-
+"""
 class WireframeViewer(wf.WireframeGroup):
     """ A group of wireframes which can be displayed on a Pygame screen """
     

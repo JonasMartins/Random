@@ -85,7 +85,16 @@ def testSurfaceDisplayWithCube():
 def testSurfaceDisplayWithSphere():
     """ Create and display a cube with surfaces. """
     
-    resolution = 52
+    viewer = wd.WireframeViewer(600, 400)
+    viewer.addWireframe('sphere', shape.Spheroid((200,200, 20), (160,160,160), resolution=30))
+    print "Create a sphere with %d faces." % len(viewer.wireframes['sphere'].faces)
+    viewer.displayEdges = False
+    viewer.run()
+
+def testSurfaceDisplayWithSphere2():
+    """ Create and display a cube with surfaces. """
+    
+    resolution = 30
     viewer = wd.WireframeViewer(600, 400)
     viewer.addWireframe('sphere', shape.Spheroid((300,200, 20), (160,160,160), resolution=resolution))
 
@@ -143,4 +152,4 @@ def chooseExample():
             exec("%s()" % examples[choice-1])
     
 if __name__ == '__main__':
-    testSurfaceDisplayWithSphere()
+    testWireframeDisplay3()
