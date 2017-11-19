@@ -11,6 +11,24 @@
 #include <stack>
 using namespace std;
 
+/*=============================================
+=            Section comment block            =
+=============================================*/
+
+/**
+ *
+ * problemas para rodar?: 
+ *	
+ *	sudo apt-get install libgl1-mesa-dev
+ *	sudo apt-get install libglu1-mesa-dev
+ *	sudo apt-get install freeglut3-dev
+ *	
+ */
+
+
+/*=====  End of Section comment block  ======*/
+
+
 // #define HEIGHT 480
 // #define WIDTH 640
 // #define RECURSION_DEPTH 5
@@ -30,6 +48,7 @@ struct Camera {
 Camera camera;
 
 /* function for recursive raytracer*/
+/*#TODO IMPLEMENTAR UM BACKFACECULLING E ALGUMA FORMA DE OTIMIZAR ESSE PROCESSO */
 Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objects, vector<Light> lights){
 	double intersectPoint = INFINITY;
 	bool doesIntersect = false;
@@ -43,6 +62,7 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 			if(intersectPoint > point){
 				intersectPoint = point;
 				intersectObject = (*it);
+				//cout<<"intersepted ";
 			}
 		}
 	}
@@ -139,6 +159,8 @@ Vec3 sendRay(Vec3 rayOrigin, Vec3 rayDirection, int level, vector<Object*> objec
 // #TODO aqui está o problema da lentidão.........
 void init(vector<Object*> objects, vector<Light> lights){
 	/*Making view transformation matrix using eye, up vector, look at vector*/
+	
+	/* aqui temos os eixos da camera, observador a serem calculados com ajuda do view up e look at*/
 	Vec3 n = (camera.pos - camera.lookAt).normalize();
 	Vec3 u = camera.up.cross(n).normalize();
 	Vec3 v = n.cross(u);
@@ -148,6 +170,15 @@ void init(vector<Object*> objects, vector<Light> lights){
 	e.y = v.dot(camera.pos)*-1;
 	e.z = n.dot(camera.pos)*-1;
 
+	// camera.pos.print();
+	// camera.lookAt.print();
+	// camera.up.print();
+
+	// cout<< "n:"; n.print();
+	// cout<< "u:"; u.print();
+	// cout<< "v:"; v.print();
+	// cout<< "e:"; e.print();
+	
 	/*
 	Avw = 
 		[u.x, u.y, u.z, e.x]
@@ -155,8 +186,14 @@ void init(vector<Object*> objects, vector<Light> lights){
 		[n.x, n.y, n.z, e.z]
 		[ 0,   0, 	0,   1 ]	
 	*/
+
+	/* Matriz de transformação para coordenada de camera */
 	double V[16] = {u.x, u.y, u.z, e.x, v.x, v.y, v.z, e.y, n.x, n.y, n.z, e.z, 0, 0, 0, 1};
+	
 	Matrix viewingTransform(V);
+
+	//cout<< "fast" <<endl;
+	//viewingTransform.print();
 
 	double aspectRatio = camera.width/(double) camera.height;
 	double angle = tan((M_PI/2)*camera.fov/180);
@@ -179,12 +216,17 @@ void init(vector<Object*> objects, vector<Light> lights){
 				rayDirection.normalize();
 
 				/*starting of ray tracer*/
+				//printf("Ray sended: %d %d\n", i,j);
 				image[i][j]+= sendRay(Vec3(0), rayDirection, 0, objects, lights);
+				 
 			}
 			image[i][j] = image[i][j] * (1/(double)camera.total_samples);
 		}
 	}
+	
+	/* #TODO ESCREVER A IMAGEM EM BINARIO PARA EVITAR IMAGENS DE TAMANHO MUITO GRANDE*/
 	/*writing into file image.ppm*/
+	cout<< "write"<<endl;
 	ofstream ofs("./image.ppm", ios::out);
 	ofs << "P3\n" << camera.width << " " << camera.height << "\n255\n";
 	for(int j=0;j<camera.height;j++) {
@@ -393,7 +435,8 @@ int main(int argc, char** argv){
 		}
 	}
 
-	cout <<"objects: "; cout << objects.size() <<endl;
-	cout <<"lights: "; cout << lights.size() <<endl;
-	//init(objects, lights);
+	//cout <<"objects: "; cout << objects.size() <<endl;
+	//cout <<"lights: "; cout << lights.size() <<endl;
+	
+	init(objects, lights);
 }
