@@ -1,59 +1,6 @@
 #include <fstream>
 #include <cmath>
-#include "./RayCasting.h"
-
-
-inline double RayCasting::dot(const Vec3& a, const Vec3& b) {
-  return (a.x*b.x + a.y*b.y + a.z*b.z);
-}
-
-
-void RayCasting::clamp255(Vec3& col) {
-  col.x = (col.x > 255) ? 255 : (col.x < 0) ? 0 : col.x;
-  col.y = (col.y > 255) ? 255 : (col.y < 0) ? 0 : col.y;
-  col.z = (col.z > 255) ? 255 : (col.z < 0) ? 0 : col.z;
-}
-
-int RayCasting::main(){
-
-  const int H = 500;
-  const int W = 500;
-
-  const Vec3 white(255, 255, 255);
-  const Vec3 black(0, 0, 0);
-  const Vec3 red(255, 0, 0);
-
-  const Sphere sphere(Vec3(W*0.5, H*0.5, 50), 50);
-  const Sphere light(Vec3(0, 0, 50), 1);
-
-  std::ofstream out("out.ppm");
-  out << "P3\n" << W << ' ' << H << ' ' << "255\n";
-
-  double t;
-  Vec3 pix_col(black);
-
-  for (int y = 0; y < H; ++y) {
-    for (int x = 0; x < W; ++x) {
-      pix_col = black;
-
-      const Ray ray(Vec3(x,y,0),Vec3(0,0,1));
-      if (sphere.intersect(ray, t)) {
-        const Vec3 pi = ray.o + ray.d*t;
-        const Vec3 L = light.c - pi;
-        const Vec3 N = sphere.getNormal(pi);
-        const double dt = dot(L.normalize(), N.normalize());
-
-        pix_col = (red + white*dt) * 0.5;
-        clamp255(pix_col);
-      }
-      out << (int)pix_col.x << ' '
-          << (int)pix_col.y << ' '
-          << (int)pix_col.z << '\n';
-    }
-  }
-}
-
-/*
+//#include "./RayCasting.h"
 
 struct Vec3 {
   double x,y,z;
@@ -143,4 +90,54 @@ int main() {
 }
 
 
-*/
+// inline double RayCasting::dot(const Vec3& a, const Vec3& b) {
+//   return (a.x*b.x + a.y*b.y + a.z*b.z);
+// }
+
+
+// void RayCasting::clamp255(Vec3& col) {
+//   col.x = (col.x > 255) ? 255 : (col.x < 0) ? 0 : col.x;
+//   col.y = (col.y > 255) ? 255 : (col.y < 0) ? 0 : col.y;
+//   col.z = (col.z > 255) ? 255 : (col.z < 0) ? 0 : col.z;
+// }
+
+// int RayCasting::main(){
+
+//   const int H = 500;
+//   const int W = 500;
+
+//   const Vec3 white(255, 255, 255);
+//   const Vec3 black(0, 0, 0);
+//   const Vec3 red(255, 0, 0);
+
+//   const Sphere sphere(Vec3(W*0.5, H*0.5, 50), 50);
+//   const Sphere light(Vec3(0, 0, 50), 1);
+
+//   std::ofstream out("out.ppm");
+//   out << "P3\n" << W << ' ' << H << ' ' << "255\n";
+
+//   double t;
+//   Vec3 pix_col(black);
+
+//   for (int y = 0; y < H; ++y) {
+//     for (int x = 0; x < W; ++x) {
+//       pix_col = black;
+
+//       const Ray ray(Vec3(x,y,0),Vec3(0,0,1));
+//       if (sphere.intersect(ray, t)) {
+//         const Vec3 pi = ray.o + ray.d*t;
+//         const Vec3 L = light.c - pi;
+//         const Vec3 N = sphere.getNormal(pi);
+//         const double dt = dot(L.normalize(), N.normalize());
+
+//         pix_col = (red + white*dt) * 0.5;
+//         clamp255(pix_col);
+//       }
+//       out << (int)pix_col.x << ' '
+//           << (int)pix_col.y << ' '
+//           << (int)pix_col.z << '\n';
+//     }
+//   }
+// }
+
+
