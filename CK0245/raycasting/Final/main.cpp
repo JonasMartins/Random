@@ -88,7 +88,12 @@ void savebmp (const char *filename, int w, int h, int dpi, RGBType *data) {
 		double green = (data[i].g)*255;
 		double blue = (data[i].b)*255;
 		
-		unsigned char color[3] = {(int)floor(blue),(int)floor(green),(int)floor(red)};
+		unsigned char floor_blue = (int)floor(blue);
+		unsigned char floor_green = (int)floor(green);
+		unsigned char floor_red = (int)floor(red);
+		
+		// b,g,r
+		unsigned char color[3] = {floor_blue,floor_green,floor_red};
 		
 		fwrite(color,1,3,f);
 	}
@@ -265,9 +270,10 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
 
 int thisone;
 
-int main (int argc, char *argv[]) {
+int main (int argc, char **argv) {
 	cout << "rendering ..." << endl;
 	
+	// capturar tempo de execução inicial
 	clock_t t1, t2;
 	t1 = clock();
 	

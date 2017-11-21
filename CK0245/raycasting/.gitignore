@@ -1,20 +1,28 @@
 # Compiled Object files
-*.slo
-*.lo
-*.o
-
+research/*.slo
+research/*.lo
+research/*.o
+research/
 # Compiled Dynamic libraries
-*.so
-*.dylib
-
+research/*.so
+research/*.dylib
+research/
 # Compiled Static libraries
-*.lai
-*.la
-*.a
-*.ppm
-a.out
-*.gch
-ray-tracer
-obj/
-images/
-out*
+research/*.lai
+research/*.la
+research/*.a
+research/*.ppm
+research/a.out
+research/*.gch
+research/ray-tracer
+research/obj/
+research/images/
+research/out*
+
+final/*.bmp
+final/*.exe
+
+from_scratch/*.bmp
+from_scratch/*.exe
+
+research/
