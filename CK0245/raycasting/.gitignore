@@ -24,5 +24,6 @@ final/*.exe
 
 from_scratch/*.bmp
 from_scratch/*.exe
+from_scratch/*.o
 
 research/
