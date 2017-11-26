@@ -90,7 +90,7 @@ public class ProxyServer {
                         break;
                     }
                     //out.println(input.toUpperCase());
-                    out.println("plplplplpll");
+                    out.println("plpplplpll");
                 }
             } catch (IOException e) {
                 log("Error handling client# " + clientNumber + ": " + e);
