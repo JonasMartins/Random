@@ -1,113 +1,115 @@
-import java.io.*;
-import java.net.*;
+// nice example http://cs.lmu.edu/~ray/notes/javanetexamples/
+// 
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 /**
+ * A server program which accepts requests from clients to
+ * capitalize strings.  When clients connect, a new thread is
+ * started to handle an interactive dialog in which the client
+ * sends in a string and the server thread sends back the
+ * capitalized version of the string.
  *
- * @author jcgonzalez.com
- *
+ * The program is runs in an infinite loop, so shutdown in platform
+ * dependent.  If you ran it from a console window with the "java"
+ * interpreter, Ctrl+C generally will shut it down.
  */
-public class ProxyMultiThread {
-    public static void main(String[] args) {
+public class ProxyServer {
+
+    /**
+     * Application method to run the server runs in an infinite loop
+     * listening on port 9898.  When a connection is requested, it
+     * spawns a new thread to do the servicing and immediately returns
+     * to listening.  The server keeps a unique client number for each
+     * client that connects just to show interesting logging
+     * messages.  It is certainly not necessary to do this.
+     */
+    public static void main(String[] args) throws Exception {
+        System.out.println("The Server is running.");
+        int clientNumber = 0;
+        ServerSocket listener = new ServerSocket(9898);
         try {
-            if (args.length != 3)
-                throw new IllegalArgumentException("insuficient arguments");
-            // and the local port that we listen for connections on
-            String host = args[0];
-            int remoteport = Integer.parseInt(args[1]);
-            int localport = Integer.parseInt(args[2]);
-            // Print a start-up message
-            System.out.println("Starting proxy for " + host + ":" + remoteport
-                    + " on port " + localport);
-            ServerSocket server = new ServerSocket(localport);
             while (true) {
-                new ThreadProxy(server.accept(), host, remoteport);
+                new Server(listener.accept(), clientNumber++).start();
             }
-        } catch (Exception e) {
-            System.err.println(e);
-            System.err.println("Usage: java ProxyMultiThread "
-                    + "<host> <remoteport> <localport>");
+        } finally {
+            listener.close();
         }
     }
-}
-/**
- * Handles a socket connection to the proxy server from the client and uses 2
- * threads to proxy between server and client
- *
- * @author jcgonzalez.com
- *
- */
-class ThreadProxy extends Thread {
-    private Socket sClient;
-    private final String SERVER_URL;
-    private final int SERVER_PORT;
-    ThreadProxy(Socket sClient, String ServerUrl, int ServerPort) {
-        this.SERVER_URL = ServerUrl;
-        this.SERVER_PORT = ServerPort;
-        this.sClient = sClient;
-        this.start();
-    }
-    @Override
-    public void run() {
-        try {
-            final byte[] request = new byte[1024];
-            byte[] reply = new byte[4096];
-            final InputStream inFromClient = sClient.getInputStream();
-            final OutputStream outToClient = sClient.getOutputStream();
-            Socket client = null, server = null;
-            // connects a socket to the server
+
+    /**
+     * A private thread to handle capitalization requests on a particular
+     * socket.  The client terminates the dialogue by sending a single line
+     * containing only a period.
+     */
+    private static class Server extends Thread {
+        private Socket socket;
+        private int clientNumber;
+
+        public Server(Socket socket, int clientNumber) {
+            this.socket = socket;
+            this.clientNumber = clientNumber;
+            log("New connection with client# " + clientNumber + " at " + socket);
+        }
+
+        /**
+         * Services this thread's client by first sending the
+         * client a welcome message then repeatedly reading strings
+         * and sending back the capitalized version of the string.
+         */
+        public void run() {
             try {
-                server = new Socket(SERVER_URL, SERVER_PORT);
-            } catch (IOException e) {
-                PrintWriter out = new PrintWriter(new OutputStreamWriter(
-                        outToClient));
-                out.flush();
-                throw new RuntimeException(e);
-            }
-            // a new thread to manage streams from server to client (DOWNLOAD)
-            final InputStream inFromServer = server.getInputStream();
-            final OutputStream outToServer = server.getOutputStream();
-            // a new thread for uploading to the server
-            new Thread() {
-                public void run() {
-                    int bytes_read;
-                    try {
-                        while ((bytes_read = inFromClient.read(request)) != -1) {
-                            outToServer.write(request, 0, bytes_read);
-                            outToServer.flush();
-                            //TODO CREATE YOUR LOGIC HERE
-                        }
-                    } catch (IOException e) {
+
+                // Decorate the streams so we can send characters
+                // and not just bytes.  Ensure output is flushed
+                // after every newline.
+                BufferedReader in = new BufferedReader(
+                        new InputStreamReader(socket.getInputStream()));
+                PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+                // Send a welcome message to the client.
+                out.println("Hello, you are client #" + (clientNumber+1) + ".");
+                out.println("All options of actions...");
+                out.println("1> option 1");
+                out.println("2> option 2");
+                out.println("3> option 3");
+                out.println("4> option 4");
+                out.println("5> option 5");
+                out.println("---------------------------");
+
+                // Get messages from the client, line by line; return them
+                // capitalized
+                while (true) {
+                    String input = in.readLine();
+                    if (input == null || input.equals(".")) {
+                        break;
                     }
-                    try {
-                        outToServer.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }.start();
-            // current thread manages streams from server to client (DOWNLOAD)
-            int bytes_read;
-            try {
-                while ((bytes_read = inFromServer.read(reply)) != -1) {
-                    outToClient.write(reply, 0, bytes_read);
-                    outToClient.flush();
-                    //TODO CREATE YOUR LOGIC HERE
+                    //out.println(input.toUpperCase());
+                    out.println("plplplplpll");
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log("Error handling client# " + clientNumber + ": " + e);
             } finally {
                 try {
-                    if (server != null)
-                        server.close();
-                    if (client != null)
-                        client.close();
+                    socket.close();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    log("Couldn't close a socket, what's going on?");
                 }
+                log("Connection with client# " + clientNumber + " closed");
             }
-            outToClient.close();
-            sClient.close();
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+
+        /**
+         * Logs a simple message.  In this case we just write the
+         * message to the server applications standard output.
+         */
+        private void log(String message) {
+            System.out.println(message);
         }
     }
 }
