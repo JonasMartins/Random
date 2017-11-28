@@ -131,20 +131,6 @@ void RayCast::Savebmp (const char *filename, unsigned short w, unsigned short h,
 
 // VECTOR CLASS METHODS =========================================================== 
 
-Vect::Vect()
-{
-	x = 0;
-	y = 0;
-	z = 0;
-}
-
-Vect::Vect(double i, double j, double k) 
-{
-	x = i;
-	y = j;
-	z = k;
-}
-
 double Vect::getVectX() { return x; }
 double Vect::getVectY() { return y; }
 double Vect::getVectZ() { return z; }
