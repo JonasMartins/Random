@@ -1,10 +1,12 @@
+#!usr/bin/python3
+
 """
 
-	 INSTALAR A BIBLIOTECA MATPLOT:
+	 INSTALL MATPLOT LIB:
 	 LINUX: sudo apt-get install python3-matplotlib
 	 ALTER: https://matplotlib.org/users/installing.html
 
-	 INSTALAR NUMPY:
+	 INSTALL NUMPY:
 	 https://www.scipy.org/scipylib/download.html
 
 """
@@ -16,7 +18,11 @@ from mpl_toolkits.mplot3d import Axes3D
 
 X = np.arange(-5, 5, 0.5)
 Y = np.arange(-5, 5, 0.5)
+
 X, Y = np.meshgrid(X, Y)
+
+# f (x) = (4 − 2.1x^2  + 1/3* x^4)y + x*y − 4(1 − y^2)y^2
+
 R = np.sqrt(X**2 + Y**2)
 Z = np.sin(R)
 
