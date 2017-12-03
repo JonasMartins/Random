@@ -12,33 +12,35 @@ class Vect
 		Vect ();
 		Vect (double, double, double);
 		
-		Vect Negative();
-		Vect Normalize();
-		Vect VectAdd(Vect);
-		Vect VectMult(double);
-		Vect CrossProduct(Vect);
+		Vect negative();
+		Vect normalize();
+		Vect vectAdd(Vect);
+		Vect vectMult(double);
+		Vect crossProduct(Vect);
 
 		double getVectZ();	
 		double getVectY();
 		double getVectX();
-		double Magnitude();
-		double DotProduct(Vect);
+		double magnitude();
+		double dotProduct(Vect);
 
-		Vect()
-		{
-			x = 0;
-			y = 0;
-			z = 0;
-		}
-
-		Vect(double i, double j, double k) 
-		{
-			x = i;
-			y = j;
-			z = k;
-		}
+		
 	
 	private:
 };
+
+Vect::Vect()
+{
+	x = 0;
+	y = 0;
+	z = 0;
+}
+
+Vect::Vect(double i, double j, double k) 
+{
+	x = i;
+	y = j;
+	z = k;
+}
 
 #endif

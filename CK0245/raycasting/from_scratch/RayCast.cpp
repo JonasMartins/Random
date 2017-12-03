@@ -10,6 +10,10 @@
 
 #include"./RayCast.h"
 #include"./Vect.h"
+#include"./Ray.h"
+#include"./Camera.h"
+#include"./Color.h"
+#include"./Light.h"
 
 
 using namespace std;
@@ -29,6 +33,41 @@ void RayCast::Run()
 	pixels = new RGBType[width * height]; 
 	//pixels = (RGBType*)malloc(sizeof((width * heigth)* RGBType)); //?	
 
+	Vect X (1,0,0);
+	Vect Y (0,1,0);
+	Vect Z (0,0,1);
+
+	// vetor posição da camera
+	Vect campos (3, 1.5, -4);
+
+	Vect look_at (0, 0, 0);
+	// vector diff between
+	// registra a diferença entre a posição da camera e a posição do look_at
+	Vect diff_btw (campos.getVectX() - look_at.getVectX(), campos.getVectY() - look_at.getVectY(), campos.getVectZ() - look_at.getVectZ());
+
+	// vetor normalizado da posição oposta do vetor direção da posição da camera e do look_at
+	
+	// kc 
+	Vect camdir = diff_btw.negative().normalize();
+	
+	// Ic 
+	Vect camright = Y.crossProduct(camdir).normalize();
+
+	//Jc
+	Vect camdown = camright.crossProduct(camdir);
+
+	// Instancia do objeto camera
+	Camera scene_cam (campos, camdir, camright, camdown);
+
+	Color white_light (1.0, 1.0, 1.0, 0);
+	Color pretty_green (0.5, 1.0, 0.5, 0.3);
+	Color maroon (0.5, 0.25, 0.25, 0);
+	Color tile_floor (1, 1, 1, 2);
+	Color gray (0.5, 0.5, 0.5, 0);
+	Color black (0.0, 0.0, 0.0, 0);
+
+	Vect light_position (-7,10,-10);
+	Light scene_light (light_position, white_light);
 
 	for(i=0;i<width;i++){
 		for(j=0;j<height;j++){
@@ -129,44 +168,123 @@ void RayCast::Savebmp (const char *filename, unsigned short w, unsigned short h,
 	fclose(f);
 }
 
-// VECTOR CLASS METHODS =========================================================== 
+/* VECTOR CLASS METHODS =========================================================== */
 
 double Vect::getVectX() { return x; }
 double Vect::getVectY() { return y; }
 double Vect::getVectZ() { return z; }
 
-double Vect::Magnitude()
+double Vect::magnitude()
 {
 	return sqrt((x*x) + (y*y) + (z*z));
 }
 
-Vect Vect::Normalize ()
+Vect Vect::normalize ()
 {
 	double magnitude = sqrt((x*x) + (y*y) + (z*z));
 	return Vect (x/magnitude, y/magnitude, z/magnitude);
 }
 
-Vect Vect::Negative()
+Vect Vect::negative()
 {
 	return Vect (-x, -y, -z);
 }
 
-double Vect::DotProduct(Vect v)
+double Vect::dotProduct(Vect v)
 {
 	return x*v.getVectX() + y*v.getVectY() + z*v.getVectZ();
 }
 
-Vect Vect::CrossProduct(Vect v)
+Vect Vect::crossProduct(Vect v)
 {
 	return Vect (y*v.getVectZ() - z*v.getVectY(), z*v.getVectX() - x*v.getVectZ(), x*v.getVectY() - y*v.getVectX());
 }
 
-Vect Vect::VectAdd (Vect v)
+Vect Vect::vectAdd (Vect v)
 {
 	return Vect (x + v.getVectX(), y + v.getVectY(), z + v.getVectZ());
 }
 
-Vect Vect::VectMult (double scalar)
+Vect Vect::vectMult (double scalar)
 {
 	return Vect (x*scalar, y*scalar, z*scalar);
 }
+/* ========================================================================== */
+
+
+/* CAMERA CLASS METHODS =========================================================== */
+
+Vect Camera::getCameraPosition () { return campos; }
+Vect Camera::getCameraDirection () { return camdir; }
+Vect Camera::getCameraRight () { return camright; }
+Vect Camera::getCameraDown () { return camdown; }
+
+/* ========================================================================== */
+
+
+
+/* COLOR CLASS METHODS =========================================================== */
+
+double Color::getColorRed() { return red; }
+double Color::getColorGreen() { return green; }
+double Color::getColorBlue() { return blue; }
+double Color::getColorSpecial() { return special; }
+
+double Color::setColorRed(double redValue) { red = redValue; }
+double Color::setColorGreen(double greenValue) { green = greenValue; }
+double Color::setColorBlue(double blueValue) { blue = blueValue; }
+double Color::setColorSpecial(double specialValue) { special = specialValue; }
+
+double Color::brightness() 
+{
+	return(red + green + blue)/3;
+}
+
+Color Color::colorScalar(double scalar) 
+{
+	return Color (red*scalar, green*scalar, blue*scalar, special);
+}
+
+Color Color::colorAdd(Color color) 
+{
+	return Color (red + color.getColorRed(), green + color.getColorGreen(), blue + color.getColorBlue(), special);
+}
+
+Color  Color::colorMultiply(Color color) 
+{
+	return Color (red*color.getColorRed(), green*color.getColorGreen(), blue*color.getColorBlue(), special);
+}
+
+Color Color::colorAverage(Color color) 
+{
+	return Color ((red + color.getColorRed())/2, (green + color.getColorGreen())/2, (blue + color.getColorBlue())/2, special);
+}
+
+Color Color::clip() 
+{
+	double alllight = red + green + blue;
+	double excesslight = alllight - 3;
+	if (excesslight > 0) {
+		red = red + excesslight*(red/alllight);
+		green = green + excesslight*(green/alllight);
+		blue = blue + excesslight*(blue/alllight);
+	}
+	if (red > 1) {red = 1;}
+	if (green > 1) {green = 1;}
+	if (blue > 1) {blue = 1;}
+	if (red < 0) {red = 0;}
+	if (green < 0) {green = 0;}
+	if (blue < 0) {blue = 0;}
+	
+	return Color (red, green, blue, special);
+}
+/* ========================================================================== */
+
+
+
+/* LIGHT CLASS METHODS =========================================================== */
+
+Vect Light::getLightPosition () { return position; }
+Color Light::getLightColor () { return color; }
+
+/* ========================================================================== */
