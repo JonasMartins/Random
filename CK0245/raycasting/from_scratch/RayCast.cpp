@@ -79,7 +79,7 @@ void RayCast::Run()
 	
 	// Y representa a normal ao plano
 	// -1 distancia para o centro
-	Plane scene_plane (Y, -1, maroon);
+	Plane scene_plane (Y, -1, maroon);	
 
 
 	for(i=0;i<width;i++){
