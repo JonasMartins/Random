@@ -1,5 +1,7 @@
 import math
-
+# https://stackoverflow.com/questions/47225830/axes3d-plot-wireframex-y-z-error
+# https://matplotlib.org/mpl_toolkits/mplot3d/tutorial.html
+# https://stackoverflow.com/questions/12514890/python-numpy-test-for-ndarray-using-ndim
 try:
     import numpy as np
     from numpy import linalg as LA
@@ -159,7 +161,7 @@ def plot_function(function):
     Y = np.arange(-1, 3.+s, s)
     X, Y = np.meshgrid(X, Y)   #create the mesh grid
     Z = map(function, X, Y)
-    ax.plot_surface(X, Y, Z, rstride = 1, cstride = 1, norm = LogNorm(), cmap = cm.jet)
+    ax.plot_wireframe(X, Y, Z, rstride = 1, cstride = 1, norm = LogNorm(), cmap = cm.jet)
     CS = plt.contour(X, Y, Z)  #plot contour
     plt.clabel(CS,inline=1, fontsize=10)
     CB = plt.colorbar(CS, shrink=0.8, extend='both')  #colorbar
@@ -243,7 +245,7 @@ def rosen_gradient(x):
     return np.array((
         -2*(1 - x[0]) - 400*x[0]*(x[1] - x[0]**2),
         200*(x[1] - x[0]**2)
-    ))
+    ),dtype='int64')
 
 
 def rosen_hessian(x):
@@ -253,7 +255,7 @@ def rosen_hessian(x):
     return np.array((
         (2 - 400*x[1] + 1200*x[0]**2,   -400*x[0]),
         (-400*x[0],                     200)
-    ))
+    ),dtype='int64')
 
 
 def rosen_function_interface(x, y):
