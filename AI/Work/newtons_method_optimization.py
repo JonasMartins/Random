@@ -273,8 +273,9 @@ x0 = np.transpose([-2, 3])
 dk=None
 x, _ = newton_solve(rosen_function, x0, rosen_gradient, rosen_hessian)
 print('Solution = {}'.format(x))
+plot_function(rosen_function_interface(1,2))
 #try:
-plot_function(rosen_function_interface)
+#plot_function(rosen_function_interface)
     #plot_contour(rosen_function_interface)
 #except:
 #   print('Matplotlib not installed, can not plot')
