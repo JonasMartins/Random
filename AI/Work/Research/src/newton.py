@@ -14,13 +14,11 @@
 '''
 from numpy import *
 from line_search import find_step_length
-'''  
-  f a função principal
-  fd gradiente de f
-  fdd hassian matrix
-  callback uma função para imprimir cada iteração
 
-'''
+# f a funcao principal
+# fd gradiente de f
+# fdd hassian matrix
+# callback uma funcao para imprimir cada iteracao
 
 def newton(f, fd, fdd, x, max_iterations, precision, callback):
 	for i in range(1, max_iterations):

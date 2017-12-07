@@ -25,24 +25,26 @@ from conjugate_gradient import *
 if __name__ == '__main__':
   
   # 100 (x1 - x0^2)^2 + (1-x0)^2
-  def f(x): return 100 * math.pow(x[1] - math.pow(x[0], 2), 2) + math.pow(1 - x[0], 2)
+  # def f(x): return 100 * math.pow(x[1] - math.pow(x[0], 2), 2) + math.pow(1 - x[0], 2)
+  def f(x): return (((4-(2.1*math.pow(x[0],2)))+(0.333*math.pow(x[0], 4)))*math.pow(x[0],2))+(x[0]*x[1]-(4*(1-math.pow(x[1],2))*math.pow(x[1],2)))
   
-  # derivada com relaçaõ a x0 400 x0^3 + (2 - 400x1) x0 - 2
-  def df_dx1(x): return 400*math.pow(x[0], 3) - 400*x[0]*x[1] + 2*x[0] - 2
-  
-  # derivada com relaçaõ a x1 200(x1 - x0^2)
-  def df_dx2(x): return 200*x[1] - 200*math.pow(x[0], 2)
-  
+  # derivada com relacao a x0 400 x0^3 + (2 - 400x1) x0 - 2
+  # def df_dx1(x): return 400*math.pow(x[0], 3) - 400*x[0]*x[1] + 2*x[0] - 2
+  def df_dx1(x): return (2*math.pow(x[0],5))-(8.2*math.pow(x[0],3))+(8*x[0])+x[1] 
+  # derivada com relacao a x1 200(x1 - x0^2)
+  # def df_dx2(x): return 200*x[1] - 200*math.pow(x[0], 2)
+  def df_dx2(x): return 16*(math.pow(x[1],3))-(8*(x[1]))+x[0]
+
   def fd(x): return array([ df_dx1(x), df_dx2(x) ])
   
-  def df_dx1_dx1(x): return 1200*math.pow(x[0], 2) - 400*x[1] + 2
-  def df_dx1_dx2(x): return-400*x[0]
+  def df_dx1_dx1(x): return (10*math.pow(x[0],4))-(24.6*(math.pow(x[0],2)))+8
+  def df_dx2_dx2(x): return (48*math.pow(x[1],2))-8
   
   # hessian matrix 200 = df_dx2_dx2
   def fdd(x):
     return array([
-        [df_dx1_dx1(x), df_dx1_dx2(x)],
-        [df_dx1_dx2(x), 200]])
+        [df_dx1_dx1(x), 1],
+        [1, df_dx2_dx2(x)]])
   
   def print_error(i, direction, alpha, x):
     opt = f(array([1,1]))
@@ -55,7 +57,7 @@ if __name__ == '__main__':
     print("iteration %d: \t direction: %s \t alpha: %.7f \t x: %s"
         % (i, ["%.7f" % _ for _ in direction], alpha, ["%.7f" % _ for _ in x]))
   
-  x = array([0, 0])
+  x = array([1, 1])
   precision = 10e-6
   max_iterations = 100
   callback = print_all
