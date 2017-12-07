@@ -26,7 +26,6 @@ def newton(f, fd, fdd, x, max_iterations, precision, callback):
 		
 		# linalg: numpy function
 		# linalg.solve: Solve a linear matrix equation, or system of linear scalar equations.
-		# Computes the “exact” solution, x, of the well-determined, i.e., full rank, linear matrix equation ax = b.
 		direction = -linalg.solve(hessian, gradient)
 		
 		'''
@@ -41,7 +40,6 @@ def newton(f, fd, fdd, x, max_iterations, precision, callback):
 		# Metodo tradicional:
 		# ainv is the hassian inverse
 		# ainv = linalg.inv(hessian)
-		
 
 		alpha = find_step_length(f, fd, x, 1.0, direction, c2=0.9)
 		x_prev = x

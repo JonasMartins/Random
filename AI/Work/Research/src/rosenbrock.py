@@ -34,9 +34,6 @@ if __name__ == '__main__':
   #       [df_dx1_dx1(x), 1],
   #       [1, df_dx2_dx2(x)]])
   
-
-
-
   def f(x): return 100 * math.pow(x[1] - math.pow(x[0], 2), 2) + math.pow(1 - x[0], 2)
   def df_dx1(x): return 400*math.pow(x[0], 3) - 400*x[0]*x[1] + 2*x[0] - 2
   def df_dx2(x): return 200*x[1] - 200*math.pow(x[0], 2)
@@ -46,7 +43,6 @@ if __name__ == '__main__':
     return array([
         [df_dx1_dx1(x), df_dx1_dx2(x)],
         [df_dx1_dx2(x), 200]])
-
 
 
 
@@ -72,8 +68,8 @@ if __name__ == '__main__':
   # print("steepest descent:")
   # steepest_descent(f, fd, x, max_iterations, precision, callback)
   
-  print("\nnewton:")
-  newton(f, fd, fdd, x, max_iterations, precision, callback)
+  # print("\nnewton:")
+  # newton(f, fd, fdd, x, max_iterations, precision, callback)
   
   print("\nquasi newton:")
   quasi_newton(f, fd, x, max_iterations, precision, callback)
