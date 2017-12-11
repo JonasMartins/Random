@@ -12,28 +12,20 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
-from numpy import *
+import numpy as np
 from line_search import find_step_length
-
-# f a funcao principal
-# fd gradiente de f
-# fdd hassian matrix
-# callback uma funcao para imprimir cada iteracao
-from numpy import *
-from line_search import find_step_length
-
 def newton(f, fd, fdd, x, max_iterations, precision, callback):
   for i in range(1, max_iterations):
     gradient = fd(x)
     hessian = fdd(x)
     
-    direction = -linalg.solve(hessian, gradient)
+    direction = -np.linalg.solve(hessian, gradient)
     alpha = find_step_length(f, fd, x, 1.0, direction, c2=0.9)
     x_prev = x
     x = x + alpha*direction
     
     callback(i, direction, alpha, x)
-    
-    if linalg.norm(x - x_prev) < precision:
+
+    if np.linalg.norm(x - x_prev) < precision:
       break
   return x

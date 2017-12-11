@@ -92,7 +92,7 @@ public class Client {
         out = new PrintWriter(socket.getOutputStream(), true);
 
         // Consume the initial welcoming messages from the server
-        for (int i = 0; i < 8; i++) {
+        for (int i = 0; i < 6; i++) {
             messageArea.append(in.readLine() + "\n");
         }
     }
@@ -101,6 +101,10 @@ public class Client {
      * Runs the client application.
      */
     public static void main(String[] args) throws Exception {
+        Manager manager = new Manager();
+        manager.startDatanodes();
+        manager.startNamenodes();
+
         Client client = new Client();
         client.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         client.frame.pack();

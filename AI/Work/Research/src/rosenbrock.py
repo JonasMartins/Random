@@ -33,23 +33,8 @@ if __name__ == '__main__':
     return array([
         [df_dx1_dx1(x), 1],
         [1, df_dx2_dx2(x)]])
-  
-  # def f(x): return 100 * math.pow(x[1] - math.pow(x[0], 2), 2) + math.pow(1 - x[0], 2)
-  # def df_dx1(x): return 400*math.pow(x[0], 3) - 400*x[0]*x[1] + 2*x[0] - 2
-  # def df_dx2(x): return 200*x[1] - 200*math.pow(x[0], 2)
-  # def df_dx1_dx1(x): return 1200*math.pow(x[0], 2) - 400*x[1] + 2
-  # def df_dx1_dx2(x): return-400*x[0]
-
-  # def fdd(x):
-  #   return array([
-  #       [df_dx1_dx1(x), df_dx1_dx2(x)],
-  #       [df_dx1_dx2(x), 200]])
-
-
 
   def fd(x): return array([ df_dx1(x), df_dx2(x) ])
-  
-  
   def print_error(i, direction, alpha, x):
     opt = f(array([1,1]))
     print("%d, %.20f" % (i, f(x)-opt))
@@ -61,20 +46,19 @@ if __name__ == '__main__':
     print("iteration %d: \t direction: %s \t alpha: %.7f \t x: %s"
         % (i, ["%.7f" % _ for _ in direction], alpha, ["%.7f" % _ for _ in x]))
   
-  x = array([1, 1])
+  x = array([-3.0, -2.0])
   precision = 10e-6
   max_iterations = 100
   callback = print_all
-  
+
   # print("steepest descent:")
   # steepest_descent(f, fd, x, max_iterations, precision, callback)
   
   print("\nnewton:")
   newton(f, fd, fdd, x, max_iterations, precision, callback)
   
-  # print("\nquasi newton:")
-  # quasi_newton(f, fd, x, max_iterations, precision, callback)
+  print("\nquasi newton:")
+  quasi_newton(f, fd, x, max_iterations, precision, callback)
   
   # print("\nconjugate gradient:")
   # conjugate_gradient(f, fd, x, max_iterations, precision, callback)
-  

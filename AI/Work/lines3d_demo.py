@@ -20,5 +20,3 @@ plt.show()
 
 
 
-
-# PLOTANDO PONTINHOS

@@ -13,7 +13,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 import numpy
-
 def find_step_length(f, fd, x, alpha, direction, c2):
   g = lambda alpha: f(x+alpha*direction)
   gd = lambda alpha: numpy.dot(fd(x + alpha*direction), direction)
@@ -35,7 +34,6 @@ def simple_backtracking(f, fd, alpha, c2):
 def interpolation(f, fd, alpha, c2):
   lo = 0.0
   hi = 1.0
-    
   for i in range(0, 20):
     if wolf1(f, fd, alpha):
       if wolf_strong(f, fd, alpha, c2):

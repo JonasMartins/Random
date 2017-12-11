@@ -1,12 +1,20 @@
 // nice example http://cs.lmu.edu/~ray/notes/javanetexamples/
-// 
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import javax.swing.JOptionPane;
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileNotFoundException;
+
+import java.util.Set;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * A server program which accepts requests from clients to
@@ -50,6 +58,8 @@ public class ProxyServer {
     private static class Server extends Thread {
         private Socket socket;
         private int clientNumber;
+        private Properties prop = null;
+        private ArrayList<String> choices;
 
         public Server(Socket socket, int clientNumber) {
             this.socket = socket;
@@ -75,11 +85,9 @@ public class ProxyServer {
                 // Send a welcome message to the client.
                 out.println("Hello, you are client #" + (clientNumber+1) + ".");
                 out.println("All options of actions...");
-                out.println("1> option 1");
-                out.println("2> option 2");
-                out.println("3> option 3");
-                out.println("4> option 4");
-                out.println("5> option 5");
+                out.println("1> Read");
+                out.println("2> Write");
+                out.println("3> Delete");
                 out.println("---------------------------");
 
                 // Get messages from the client, line by line; return them
@@ -90,7 +98,27 @@ public class ProxyServer {
                         break;
                     }
                     //out.println(input.toUpperCase());
-                    out.println("plpplplpll");
+                    byte aux = safeParse(input);
+                    String choice;
+                    switch (aux){
+                        case 1:
+                            //out.println(aux+10);
+                            choice = choose();
+                            out.println(choice);
+                            break;
+                        case 2:
+                            //out.println(aux+10);
+                            choice = choose();
+                            out.println(choice);
+                            break;
+                        case 3:
+                            //out.println(aux+10);
+                            choice = choose();
+                            out.println(choice);
+                            break;
+                        default:
+                            out.println("Invalid entry option");
+                    }
                 }
             } catch (IOException e) {
                 log("Error handling client# " + clientNumber + ": " + e);
@@ -104,6 +132,66 @@ public class ProxyServer {
             }
         }
 
+        private byte safeParse(String entry){
+            byte entryParsed = 0;
+            try {
+                entryParsed = Byte.parseByte(entry);
+            }catch(NumberFormatException e){
+                e.printStackTrace();
+            }
+            return entryParsed;
+        }
+        /* return all keys from properties as set */
+        public Set<Object> getAllKeys(Properties prop){
+            Set<Object> keys = prop.keySet();
+            return keys;
+        }
+
+        public String getPropertyValue(String key){
+            return this.prop.getProperty(key);
+        }
+
+        /**
+         *
+         * Show options based on files.properties file keeping track of possible
+         * deleted files, even when a file was deleted from user, the propertie file
+         * is used to show this options.
+         *
+         */
+        public String choose(){
+            
+            choices = new ArrayList<String>();
+            InputStream is = null;
+            try {
+                this.prop = new Properties();
+                is = this.getClass().getResourceAsStream("/files.properties");
+                prop.load(is);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Set<Object> keys = getAllKeys(prop);
+            for(Object k:keys){
+                String key = (String)k;
+                choices.add(key);
+                //System.out.println(key+": "+mpc.getPropertyValue(key));
+            }
+            String[] options = new String[choices.size()];
+            int i=0;
+            for(String s: choices){
+                options[i] = s;
+                i++;
+            }
+
+            String input = (String) JOptionPane.showInputDialog(null, "Choose now...",
+                    "The Choice of a Lifetime", JOptionPane.QUESTION_MESSAGE, null,
+                    options, // Array of choices
+                    options[1]); // Initial choice
+        
+            return input;
+        }
         /**
          * Logs a simple message.  In this case we just write the
          * message to the server applications standard output.
