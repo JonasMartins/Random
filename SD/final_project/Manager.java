@@ -89,20 +89,19 @@ public class Manager {
 			namenodes.add(new Namenode(array[i])); 
 		}
 		// write files list and his path on files.properties.
-		// if file already exists will do nothing
+		// if file already exists will do update them
 		File fileProperties = new File("files.properties");
-		if(!fileProperties.exists()){
+		
+		if(!fileProperties.exists()){ //IMPORTANTE SEMPRE SOBRESCREVER VISANDO UMA POSIVEL REMOCAO
 			try{
-				i = 0;
 				int bucket;
 				Datanode datanode;
 				output = new FileOutputStream(fileProperties, false);		
 								
 				for(Namenode namenode: namenodes){
 					bucket = namenode.hashCode();
-					datanode = (Datanode)datanodes.get(bucket);
-					prop.setProperty(array[i],datanode.getUrl());
-					i++;
+					datanode = (Datanode)datanodes.get(bucket); 
+					prop.setProperty(namenode.getFileName(),datanode.getUrl());
 				}
 				
 				prop.store(output, null);
@@ -117,22 +116,24 @@ public class Manager {
 					}
 				}
 			}
+			//}
+			File nodeOne = new File("datanodes/data_one/shopping.txt");
+			if(!nodeOne.exists()){
+				for(Namenode n: namenodes){
+					createFile(n);
+				}
+			}
 		}
-
-		for(Namenode n: namenodes){
-			//System.out.println(n.hashCode());
-			//System.out.println("Namenode " + n + " should stay on:");
-			createFile(n);
-		}
-
 	}
 	public static void createFile(Namenode namenode){
+		String s = "File created! : " + namenode.getFileName();
+		byte data[] = s.getBytes();
 		Datanode d;
 		int bucket = namenode.hashCode(); // 0,1,2
 		d = (Datanode)datanodes.get(bucket);
-		// Path do arquivo inicial
 		Path path = Paths.get(d.getUrl()+namenode.getFileName());
-		try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path, CREATE, APPEND))) {
+		try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
+	    	out.write(data, 0, data.length);
 	    } catch (IOException x) {
 	      System.err.println(x);
 	    }

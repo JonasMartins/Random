@@ -1,5 +1,8 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Font;
+
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+
 
 /**
  * A simple Swing-based client for the capitalization server.
@@ -24,7 +28,7 @@ public class Client {
     private PrintWriter out;
     private JFrame frame = new JFrame("Terminal");
     private JTextField dataField = new JTextField(40);
-    private JTextArea messageArea = new JTextArea(40, 40);
+    private JTextArea messageArea = new JTextArea(30, 40);
 
     /**
      * Constructs the client by laying out the GUI and registering a
@@ -35,9 +39,10 @@ public class Client {
 
         // Layout 
         messageArea.setEditable(false);
+        messageArea.setFont(new Font("Monaco", Font.BOLD, 12));
         frame.getContentPane().add(dataField, "North");
         frame.getContentPane().add(new JScrollPane(messageArea), "Center");
-
+        frame.setLocationRelativeTo(null); // centrealizando 
         // Add Listeners
         dataField.addActionListener(new ActionListener() {
             /**

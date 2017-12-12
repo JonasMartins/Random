@@ -1,20 +1,37 @@
-// nice example http://cs.lmu.edu/~ray/notes/javanetexamples/
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
-
-import javax.swing.JOptionPane;
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.FileNotFoundException;
 
+import java.net.Socket;
+import java.net.ServerSocket;
+
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Properties;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.DirectoryNotEmptyException;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JButton;
+
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 /**
  * A server program which accepts requests from clients to
@@ -60,6 +77,9 @@ public class ProxyServer {
         private int clientNumber;
         private Properties prop = null;
         private ArrayList<String> choices;
+        private JFrame frame = new JFrame("Edit Your File");
+        private JTextArea messageArea = new JTextArea(20, 60);
+        private JButton doneEdit = new JButton("Done");
 
         public Server(Socket socket, int clientNumber) {
             this.socket = socket;
@@ -97,29 +117,38 @@ public class ProxyServer {
                     if (input == null || input.equals(".")) {
                         break;
                     }
-                    //out.println(input.toUpperCase());
                     byte aux = safeParse(input);
                     String choice;
                     switch (aux){
                         case 1:
-                            //out.println(aux+10);
+                            String line;
                             choice = choose();
-                            out.println(choice);
+                            out.println("...");
+                            JOptionPane.showMessageDialog(null,readFromFile(getFileUrl(choice)));
+                            out.println("Reading:" + getFileUrl(choice));
                             break;
                         case 2:
-                            //out.println(aux+10);
                             choice = choose();
-                            out.println(choice);
+                            out.println("...");
+                            writeToFile(getFileUrl(choice));
+                            out.println("Editing: " + getFileUrl(choice));
                             break;
                         case 3:
-                            //out.println(aux+10);
                             choice = choose();
-                            out.println(choice);
+                            out.println("...");
+                            if (deleteFile(choice) == 3){
+                                JOptionPane.showMessageDialog(null,"File deleted successfully.");
+                            } else {
+                                JOptionPane.showMessageDialog(null,"Something went Wrong.");
+                            }
+                            out.println("Deleting:" + getFileUrl(choice));
+                            
                             break;
                         default:
-                            out.println("Invalid entry option");
+                            System.out.println("Invalid entry option");
                     }
                 }
+                out.close();
             } catch (IOException e) {
                 log("Error handling client# " + clientNumber + ": " + e);
             } finally {
@@ -150,7 +179,6 @@ public class ProxyServer {
         public String getPropertyValue(String key){
             return this.prop.getProperty(key);
         }
-
         /**
          *
          * Show options based on files.properties file keeping track of possible
@@ -160,7 +188,24 @@ public class ProxyServer {
          */
         public String choose(){
             
-            choices = new ArrayList<String>();
+            choices = getCurrentStringFiles();
+            
+            String[] options = new String[choices.size()];
+            int i=0;
+            for(String s: choices){
+                options[i] = s;
+                i++;
+            }
+
+            String input = (String) JOptionPane.showInputDialog(null, "Choose from avaliable files",
+                    "Select One", JOptionPane.QUESTION_MESSAGE, null,
+                    options, // Array of choices
+                    options[1]); // Initial choice
+        
+            return input;
+        }
+        /* Recieve the file name and Returns file's full path */
+        public String getFileUrl(String file){
             InputStream is = null;
             try {
                 this.prop = new Properties();
@@ -171,27 +216,144 @@ public class ProxyServer {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            return prop.getProperty(file)+file;   
+        }
+        /**
+         *
+         * Mapping current files from files.properties
+         *
+         */
+        public ArrayList<String> getCurrentStringFiles(){
+            ArrayList<String> aux = new ArrayList<String>();
+            InputStream is = null;
+            try {
+                this.prop = new Properties();
+                is = this.getClass().getResourceAsStream("/files.properties");
+                prop.load(is);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             Set<Object> keys = getAllKeys(prop);
             for(Object k:keys){
                 String key = (String)k;
-                choices.add(key);
+                aux.add(key);
                 //System.out.println(key+": "+mpc.getPropertyValue(key));
             }
-            String[] options = new String[choices.size()];
-            int i=0;
-            for(String s: choices){
-                options[i] = s;
-                i++;
+            return aux;
+        }
+        /**
+         *
+         * Recebe o path completo do arquivo que foi selecionado
+         * pelo JOptionpane, lê esse arquivo e devolve para run() 
+         * onde será impresso no frame 
+         *
+         */
+        public String readFromFile(String path){            
+            String content = "."; 
+            try {
+                content = new String(Files.readAllBytes(Paths.get(path)));
+            }catch(IOException e) {
+                log("Couldn't read file content, what's going on?");
+            }
+            return content;
+        }
+        /**
+         *
+         * Receber o path do arquivo, abrir um pop up para a edição com um botão ok
+         * e retornar a salvar o arquivo com o novo texto.
+         */
+        
+        public void writeToFile(String path){
+            String currentContent = readFromFile(path);
+
+            messageArea.setEditable(true);
+            messageArea.setFont(new Font("Monaco", Font.BOLD, 13));
+            messageArea.append(currentContent);
+            frame.getContentPane().add(doneEdit, "South");
+            frame.getContentPane().add(new JScrollPane(messageArea), "Center");
+            frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
+        
+            doneEdit.addActionListener(new ActionListener(){
+              public void actionPerformed(ActionEvent e){
+                if(saveFileContent(path,messageArea.getText())){
+                    frame.dispose(); // when done, edit frame is closed
+                } else {
+                    System.out.println("Something Wrong when try to edit the file.");
+                }
+              }
+            });            
+
+        }
+        /**
+         *
+         * Gravando a string content no arquivo file
+         *
+         */
+        public boolean saveFileContent(String file, String content){
+            //System.out.println(file);
+            //System.out.println(content);
+            boolean flag = false;
+            Path path = Paths.get(file);
+            byte data[] = content.getBytes();
+
+            //System.out.println(data);
+            
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
+                out.write(data, 0, data.length);
+                flag = true;
+            } catch (IOException x) {
+              System.err.println(x);
+            }
+            return flag;
+        }
+        /**
+         *
+         * Recebe nome do arquivo e remove tanto de properties
+         * quanto remove o arquivo., tudo ok: flag = 3;
+         *
+         */
+        public int deleteFile(String file){
+            int flag = 0;
+            /* DELETE FILE FROM DISK */
+            try {
+                Files.delete(Paths.get(getFileUrl(file)));
+                flag += 1;
+            } catch (NoSuchFileException x) {
+                System.err.format("%s: no such" + " file or directory%n", getFileUrl(file));
+            } catch (DirectoryNotEmptyException x) {
+                System.err.format("%s not empty%n", getFileUrl(file));
+            } catch (IOException x) {
+                // File permission problems are caught here.
+                System.err.println(x);
             }
 
-            String input = (String) JOptionPane.showInputDialog(null, "Choose now...",
-                    "The Choice of a Lifetime", JOptionPane.QUESTION_MESSAGE, null,
-                    options, // Array of choices
-                    options[1]); // Initial choice
-        
-            return input;
+            /* DELETE FILE FROM PROPERTIES */
+            InputStream is = null;
+            try {
+                this.prop = new Properties();
+                is = this.getClass().getResourceAsStream("/files.properties");
+                prop.load(is);
+                flag += 1;
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            prop.remove(file); // attempt to remove
+            
+            try (OutputStream out = Files.newOutputStream(Paths.get("files.properties"),StandardOpenOption.TRUNCATE_EXISTING)){
+                prop.store(out, null);
+                flag += 1;
+            }catch (IOException e) {
+                e.printStackTrace();
+            }
+            return flag;
         }
+
         /**
          * Logs a simple message.  In this case we just write the
          * message to the server applications standard output.
