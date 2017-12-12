@@ -23,7 +23,6 @@ import javax.swing.JTextField;
  * them.
  */
 public class Client {
-
     private BufferedReader in;
     private PrintWriter out;
     private JFrame frame = new JFrame("Terminal");
@@ -97,7 +96,7 @@ public class Client {
         out = new PrintWriter(socket.getOutputStream(), true);
 
         // Consume the initial welcoming messages from the server
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 7; i++) {
             messageArea.append(in.readLine() + "\n");
         }
     }

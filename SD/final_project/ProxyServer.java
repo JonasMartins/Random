@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
+import java.io.FileInputStream;
 import java.io.BufferedOutputStream;
 import java.io.PrintWriter;
 import java.io.File;
@@ -15,6 +16,8 @@ import java.net.ServerSocket;
 import java.util.Set;
 import java.util.ArrayList;
 import java.util.Properties;
+
+import java.util.HashMap;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -54,10 +57,14 @@ public class ProxyServer {
      * client that connects just to show interesting logging
      * messages.  It is certainly not necessary to do this.
      */
+    
+    private static HashMap<Integer, Datanode> datanodes = new HashMap<Integer, Datanode>();
+
     public static void main(String[] args) throws Exception {
         System.out.println("The Server is running.");
         int clientNumber = 0;
         ServerSocket listener = new ServerSocket(9898);
+        startDatanodes();
         try {
             while (true) {
                 new Server(listener.accept(), clientNumber++).start();
@@ -65,6 +72,20 @@ public class ProxyServer {
         } finally {
             listener.close();
         }
+    }
+
+    public static void startDatanodes(){
+        // criando 3 diretórios datanodes iniciais
+        File nodeOne = new File("datanodes/data_one");
+        File nodeTwo = new File("datanodes/data_two");
+        File nodeThree = new File("datanodes/data_three");
+        // Criando os objetos datanode
+        Datanode one = new Datanode("one",0);
+        Datanode two = new Datanode("two",1);
+        Datanode three = new Datanode("three",2);
+        datanodes.put(one.getId(),one);
+        datanodes.put(two.getId(),two);
+        datanodes.put(three.getId(),three);
     }
 
     /**
@@ -108,6 +129,7 @@ public class ProxyServer {
                 out.println("1> Read");
                 out.println("2> Write");
                 out.println("3> Delete");
+                out.println("4> Create");
                 out.println("---------------------------");
 
                 // Get messages from the client, line by line; return them
@@ -121,28 +143,28 @@ public class ProxyServer {
                     String choice;
                     switch (aux){
                         case 1:
-                            String line;
                             choice = choose();
-                            out.println("...");
-                            JOptionPane.showMessageDialog(null,readFromFile(getFileUrl(choice)));
                             out.println("Reading:" + getFileUrl(choice));
+                            JOptionPane.showMessageDialog(null,readFromFile(getFileUrl(choice)));
                             break;
                         case 2:
                             choice = choose();
-                            out.println("...");
-                            writeToFile(getFileUrl(choice));
                             out.println("Editing: " + getFileUrl(choice));
+                            writeToFile(getFileUrl(choice));
                             break;
                         case 3:
                             choice = choose();
-                            out.println("...");
                             if (deleteFile(choice) == 3){
                                 JOptionPane.showMessageDialog(null,"File deleted successfully.");
                             } else {
                                 JOptionPane.showMessageDialog(null,"Something went Wrong.");
                             }
-                            out.println("Deleting:" + getFileUrl(choice));
-                            
+                            out.println("Deleting:" + getFileUrl(choice));                            
+                            break;
+                        case 4:
+                            choice = JOptionPane.showInputDialog(null,"New File");
+                            createFile(choice);
+                            out.println("Created: " + getFileUrl(choice));
                             break;
                         default:
                             System.out.println("Invalid entry option");
@@ -352,6 +374,48 @@ public class ProxyServer {
                 e.printStackTrace();
             }
             return flag;
+        }
+        /**
+         *
+         * Criando um arquivo 
+         *
+         */
+        public void createFile(String file){
+
+            Namenode namenode = new Namenode(file);
+            String s = namenode.getFileName();
+            byte data[] = s.getBytes();
+            Datanode d;
+            int bucket = namenode.hashCode(); // 0,1,2
+            d = (Datanode)datanodes.get(bucket);
+            Path path = Paths.get(d.getUrl()+namenode.getFileName());
+            try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(path))) {
+                out.write(data, 0, data.length);
+            } catch (IOException x) {
+              System.err.println(x);
+            }
+
+            File fileProperties = new File("files.properties");
+            Properties prop = new Properties();
+            OutputStream output = null;
+            try{
+                prop.load(new FileInputStream(fileProperties));
+                prop.put(namenode.getFileName(),d.getUrl());
+                output = new FileOutputStream(fileProperties);       
+                prop.store(output, null);
+            } catch (IOException io) {
+                io.printStackTrace();
+            } finally {
+                if (output != null) {
+                    try {
+                        output.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        
         }
 
         /**

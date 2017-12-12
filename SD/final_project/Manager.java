@@ -31,9 +31,7 @@ public class Manager {
 
 	private static HashMap<Integer, Datanode> datanodes = new HashMap<Integer, Datanode>();
 	private static Collection<Namenode> namenodes = new HashSet<Namenode>();
-
 	/**
-	 *
 	 * Iniciando a aplicação com a criação dos diretórios
 	 * e armazenando no arrayList local
 	 */
@@ -92,41 +90,40 @@ public class Manager {
 		// if file already exists will do update them
 		File fileProperties = new File("files.properties");
 		
-		if(!fileProperties.exists()){ //IMPORTANTE SEMPRE SOBRESCREVER VISANDO UMA POSIVEL REMOCAO
-			try{
-				int bucket;
-				Datanode datanode;
-				output = new FileOutputStream(fileProperties, false);		
-								
-				for(Namenode namenode: namenodes){
-					bucket = namenode.hashCode();
-					datanode = (Datanode)datanodes.get(bucket); 
-					prop.setProperty(namenode.getFileName(),datanode.getUrl());
-				}
-				
-				prop.store(output, null);
-			}catch (IOException io) {
-				io.printStackTrace();
-			} finally {
-				if (output != null) {
-					try {
-						output.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+		//if(fileProperties.exists()){ //IMPORTANTE SEMPRE SOBRESCREVER VISANDO UMA POSSIVEL REMOCAO
+		try{
+			int bucket;
+			Datanode datanode;
+			output = new FileOutputStream(fileProperties, false);		
+							
+			for(Namenode namenode: namenodes){
+				bucket = namenode.hashCode();
+				datanode = (Datanode)datanodes.get(bucket); 
+				prop.setProperty(namenode.getFileName(),datanode.getUrl());
+			}
+			
+			prop.store(output, null);
+		}catch (IOException io) {
+			io.printStackTrace();
+		} finally {
+			if (output != null) {
+				try {
+					output.close();
+				} catch (IOException e) {
+					e.printStackTrace();
 				}
 			}
-			//}
-			File nodeOne = new File("datanodes/data_one/shopping.txt");
-			if(!nodeOne.exists()){
-				for(Namenode n: namenodes){
-					createFile(n);
-				}
+		}
+		//}
+		File nodeOne = new File("datanodes/data_one/shopping.txt");
+		if(!nodeOne.exists()){
+			for(Namenode n: namenodes){
+				createFile(n);
 			}
 		}
 	}
 	public static void createFile(Namenode namenode){
-		String s = "File created! : " + namenode.getFileName();
+		String s = namenode.getFileName();
 		byte data[] = s.getBytes();
 		Datanode d;
 		int bucket = namenode.hashCode(); // 0,1,2
