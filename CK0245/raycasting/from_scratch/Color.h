@@ -7,25 +7,57 @@ class Color {
 	public:
 	
 	Color ();
+	// quarto argumento refere-se ao brilho de cada cor, como um metal reluzente dependo do valor dado.
 	Color (double, double, double, double);
 	
 	// method functions
-	double brightness();
-	double getColorRed();
-	double getColorBlue();
-	double getColorGreen();
-	double getColorSpecial();
-	double setColorRed(double);
-	double setColorBlue(double);
-	double setColorGreen(double);
-	double setColorSpecial(double);
+	double getColorRed() { return red; }
+	double getColorGreen() { return green; }
+	double getColorBlue() { return blue; }
+	double getColorSpecial() { return special; }
 	
-
-	Color clip();
-	Color colorAdd(Color);
-	Color colorScalar(double);
-	Color colorAverage(Color);
-	Color colorMultiply(Color);
+	double setColorRed(double redValue) { red = redValue; }
+	double setColorGreen(double greenValue) { green = greenValue; }
+	double setColorBlue(double blueValue) { blue = blueValue; }
+	double setColorSpecial(double specialValue) { special = specialValue; }
+	
+	double brightness() {
+		return(red + green + blue)/3;
+	}
+	
+	Color colorScalar(double scalar) {
+		return Color (red*scalar, green*scalar, blue*scalar, special);
+	}
+	
+	Color colorAdd(Color color) {
+		return Color (red + color.getColorRed(), green + color.getColorGreen(), blue + color.getColorBlue(), special);
+	}
+	
+	Color colorMultiply(Color color) {
+		return Color (red*color.getColorRed(), green*color.getColorGreen(), blue*color.getColorBlue(), special);
+	}
+	
+	Color colorAverage(Color color) {
+		return Color ((red + color.getColorRed())/2, (green + color.getColorGreen())/2, (blue + color.getColorBlue())/2, special);
+	}
+	
+	Color clip() {
+		double alllight = red + green + blue;
+		double excesslight = alllight - 3;
+		if (excesslight > 0) {
+			red = red + excesslight*(red/alllight);
+			green = green + excesslight*(green/alllight);
+			blue = blue + excesslight*(blue/alllight);
+		}
+		if (red > 1) {red = 1;}
+		if (green > 1) {green = 1;}
+		if (blue > 1) {blue = 1;}
+		if (red < 0) {red = 0;}
+		if (green < 0) {green = 0;}
+		if (blue < 0) {blue = 0;}
+		
+		return Color (red, green, blue, special);
+	}
 };
 
 Color::Color () {

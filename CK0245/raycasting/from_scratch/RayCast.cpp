@@ -15,32 +15,167 @@
 #include"./Color.h"
 #include"./Light.h"
 #include"./Sphere.h"
+#include"./Source.h"
 #include"./Object.h"
 #include"./Plane.h"
 
-
-
 using namespace std;
+/**
+ *
+ * função mais complexa do trabalho.
+ * pega a cor do objeto interseptado, a normal no local de intersecção, loop pelas fontes de luz, 
+ * determina em qual direção ir do nosso ponto de intersecção até a fonte de luz, então cria raios para
+ * a direção das fontes de luz, se tiver alguma intersecção, a primeira intersecção vai estar com sombra
+ *
+ */
+Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, vector<Object*> scene_objects, int index_of_winning_object, vector<Source*> light_sources, double accuracy, double ambientlight) {
+	
+	// int reflection_index;
+	// int object_index;
+	// int light_index;
+	// int square;
+
+	// normal e cor do objeto interseptado.
+	Color winning_object_color = scene_objects.at(index_of_winning_object)->getColor();
+	Vect winning_object_normal = scene_objects.at(index_of_winning_object)->getNormalAt(intersection_position);
+	
+	Color final_color = winning_object_color.colorScalar(ambientlight);
+	
+	// if (winning_object_color.getColorSpecial() == 2) {
+	// 	// checkered/tile floor pattern
+		
+	// 	int square = (int)floor(intersection_position.getVectX()) + (int)floor(intersection_position.getVectZ());
+		
+	// 	if ((square % 2) == 0) {
+	// 		// black tile
+	// 		winning_object_color.setColorRed(0);
+	// 		winning_object_color.setColorGreen(0);
+	// 		winning_object_color.setColorBlue(0);
+	// 	}
+	// 	else {
+	// 		// white tile
+	// 		winning_object_color.setColorRed(1);
+	// 		winning_object_color.setColorGreen(1);
+	// 		winning_object_color.setColorRed(1);
+	// 	}
+	// }
+	
+	// Color final_color = winning_object_color.colorScalar(ambientlight);
+	
+	// if (winning_object_color.getColorSpecial() > 0 && winning_object_color.getColorSpecial() <= 1) {
+	// 	// reflection from objects with specular intensity
+	// 	double dot1 = winning_object_normal.dotProduct(intersecting_ray_direction.negative());
+	// 	Vect scalar1 = winning_object_normal.vectMult(dot1);
+	// 	Vect add1 = scalar1.vectAdd(intersecting_ray_direction);
+	// 	Vect scalar2 = add1.vectMult(2);
+	// 	Vect add2 = intersecting_ray_direction.negative().vectAdd(scalar2);
+	// 	Vect reflection_direction = add2.normalize();
+		
+	// 	Ray reflection_ray (intersection_position, reflection_direction);
+		
+	// 	// determine what the ray intersects with first
+	// 	vector<double> reflection_intersections;
+		
+	// 	for (int reflection_index = 0; reflection_index < scene_objects.size(); reflection_index++) {
+	// 		reflection_intersections.push_back(scene_objects.at(reflection_index)->findIntersection(reflection_ray));
+	// 	}
+		
+	// 	int index_of_winning_object_with_reflection = winningObjectIndex(reflection_intersections);
+		
+	// 	if (index_of_winning_object_with_reflection != -1) {
+	// 		// reflection ray missed everthing else
+	// 		if (reflection_intersections.at(index_of_winning_object_with_reflection) > accuracy) {
+	// 			// determine the position and direction at the point of intersection with the reflection ray
+	// 			// the ray only affects the color if it reflected off something
+				
+	// 			Vect reflection_intersection_position = intersection_position.vectAdd(reflection_direction.vectMult(reflection_intersections.at(index_of_winning_object_with_reflection)));
+	// 			Vect reflection_intersection_ray_direction = reflection_direction;
+				
+	// 			Color reflection_intersection_color = getColorAt(reflection_intersection_position, reflection_intersection_ray_direction, scene_objects, index_of_winning_object_with_reflection, light_sources, accuracy, ambientlight);
+				
+	// 			final_color = final_color.colorAdd(reflection_intersection_color.colorScalar(winning_object_color.getColorSpecial()));
+	// 		}
+	// 	}
+	// }
+	
+	//loop pelas fonte de luz
+	for (int light_index = 0; light_index < light_sources.size(); light_index++) {
+		
+		Vect light_direction = light_sources.at(light_index)->getLightPosition().vectAdd(intersection_position.negative()).normalize();
+		
+		// coseno do angulo entre dois vetores
+		float cosine_angle = winning_object_normal.dotProduct(light_direction);
+		
+		// test for shadows
+		if (cosine_angle > 0) {
+		
+			bool shadowed = false;
+
+			// distancia da fonte de luz para o nosso ponto de intersecção
+			Vect distance_to_light = light_sources.at(light_index)->getLightPosition().vectAdd(intersection_position.negative()).normalize();
+			
+			float distance_to_light_magnitude = distance_to_light.magnitude();
+
+			// Raio que vai do nosso ponto de interseção para a fonte de luz
+			// testar se o raio intersepta alguma coisa no caminho do ponto de intersecção e a fonte de luz. 
+			// se Sim, siginifca que o ponto de intersecção está sob sombras
+			Ray shadow_ray (intersection_position, light_sources.at(light_index)->getLightPosition().vectAdd(intersection_position.negative()).normalize());
+			
+			vector<double> secondary_intersections;
+			
+			for (int object_index = 0; object_index < scene_objects.size() && shadowed == false; object_index++) {
+				secondary_intersections.push_back(scene_objects.at(object_index)->findIntersection(shadow_ray));
+			}
+			// loop pelas intersecções secundárias, se houver um ponto de intersecção lá, que seja menor que a distancia
+			// da fonte de luz, isso significa que o pixel não está sob sombra.
+			for (int c = 0; c < secondary_intersections.size(); c++) {
+				if (secondary_intersections.at(c) > accuracy) {
+					if (secondary_intersections.at(c) <= distance_to_light_magnitude) {
+						shadowed = true;
+					}
+				break; // se esse break estiver depois dos ifs, apenas serão postas sombras sob o primeiro objeto e não nos outros
+				}
+			}
+			
+			if (shadowed == false) {
+				final_color = final_color.colorAdd(winning_object_color.colorMultiply(light_sources.at(light_index)->getLightColor()).colorScalar(cosine_angle));
+				
+				// determinando o valor especial da propriedade do objeto.
+				if (winning_object_color.getColorSpecial() > 0 && winning_object_color.getColorSpecial() <= 1) {
+					// special [0-1]
+					double dot1 = winning_object_normal.dotProduct(intersecting_ray_direction.negative());
+					Vect scalar1 = winning_object_normal.vectMult(dot1);
+					Vect add1 = scalar1.vectAdd(intersecting_ray_direction);
+					Vect scalar2 = add1.vectMult(2);
+					Vect add2 = intersecting_ray_direction.negative().vectAdd(scalar2);
+					Vect reflection_direction = add2.normalize();
+					
+					double specular = reflection_direction.dotProduct(light_direction);
+					if (specular > 0) {
+						specular = pow(specular, 10);
+						final_color = final_color.colorAdd(light_sources.at(light_index)->getLightColor().colorScalar(specular*winning_object_color.getColorSpecial()));
+					}
+				}
+			}
+		}
+	}
+	
+	return final_color;
+}
 
 // gambiarra 
 int winningObjectIndex(vector<double> object_intersections) {
 	// return the index of the winning intersection
 	int index_of_minimum_value;
 	// prevent unnessary calculations
-	if (object_intersections.size() == 0) {
-		// if there are no intersections
-		return -1;
-	}
-	else if (object_intersections.size() == 1) {
+	// if there are no intersections
+	if (object_intersections.size() == 0) {	return -1; }
 		// aqui pegamos a primeira intersecção
-		if (object_intersections.at(0) > 0) {
+	else if (object_intersections.size() == 1) {
 			// if that intersection is greater than zero then its our index of minimum value
-			return 0;
-		}
-		else {
-			// otherwise the only intersection value is negative
-			return -1;
-		}
+		if (object_intersections.at(0) > 0) { return 0;}
+		// otherwise the only intersection value is negative
+		else { return -1; }
 	}
 	// se existem mais de um ponto de intersecção	
 	else {
@@ -63,10 +198,8 @@ int winningObjectIndex(vector<double> object_intersections) {
 			}
 			return index_of_minimum_value;
 		}
-		else {
-			// all the intersections were negative
-			return -1;
-		}
+		// all the intersections were negative
+		else {	return -1; }
 	}
 }// end of winningObjectIndex
 
@@ -74,17 +207,36 @@ void RayCast::Run()
 {
 	cout<<"rendering..."<<endl;
 	
-	int index;
-	
+	// VGA: 640 x 480 pixels;
+	// WVGA: 800 x 480 pixels;
+	// FWVGA: 854 x 480 pixels;
+	// QVGA: 320 x 240 pixels;
+	// QQVGA: 160 x 120 pixels;
+	// HQVGA: 240 x 160 pixels;
+	// WQVGA: 400 x 240 pixels;
+	// HVGA: 480 x 320 pixels;
+	// WVGA: 800 x 480 pixels;
+	// SVGA: 800 x 600 pixels;
+	// DVGA: 960 x 640 pixels;
+	// WSVGA: 1024 x 600 pixels.
+
+	// 1152 x 768 pixels;
+	// 1280 x 720 pixels;
+	// 1280 x 768 pixels;
+	// 1280 x 800 pixels;
+	// 1360 x 768 pixels;
+	// 1366 x 768 pixels.
 
 	unsigned short i;
 	unsigned short j;
-	unsigned short width = 640;
-	unsigned short height = 480;
-	unsigned short dpi = 72;
-	unsigned short thisOne;
+	unsigned short width = 800;
+	unsigned short height = 600;
+	unsigned short dpi = 72; // padrão suficiente
 
 	double aspectratio = (double)width/(double)height;
+	double ambientlight = 0.2;
+	double accuracy = 0.00000001;
+
 
 	RGBType *pixels;
 	pixels = new RGBType[width * height]; 
@@ -126,6 +278,11 @@ void RayCast::Run()
 
 	Vect light_position (-7,10,-10);
 	Light scene_light (light_position, white_light);
+	vector<Source*> light_sources;
+	
+	// multiple light sources
+	light_sources.push_back(dynamic_cast<Source*>(&scene_light));
+	
 
 	// scene objects
 	Sphere scene_sphere (O, 1, pretty_green);
@@ -140,11 +297,18 @@ void RayCast::Run()
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
 
 	double xamnt,yamnt; // um pouco mais a direita, e um pouco mais a esquerda da direção da camera.
+	Vect cam_ray_origin;
+	Vect cam_ray_direction;
+	Vect intersection_position;
+	Vect intersecting_ray_direction;
+	
+	Color intersection_color;
 
 	for(i=0;i<width;i++){
+
 		for(j=0;j<height;j++){
 			
-			thisOne = (j*width) + i;
+			int thisOne = j*width + i;
 
 			/**
 			 *
@@ -170,13 +334,13 @@ void RayCast::Run()
 				yamnt = ((height - j) + 0.5)/height;
 			}
 			// get camera origin 
-			Vect cam_ray_origin = scene_cam.getCameraPosition();
+			cam_ray_origin = scene_cam.getCameraPosition();
 			// direção que a camera aponta 
-			Vect cam_ray_direction = camdir.vectAdd(camright.vectMult(xamnt - 0.5).vectAdd(camdown.vectMult(yamnt - 0.5))).normalize();
+			cam_ray_direction = camdir.vectAdd(camright.vectMult(xamnt - 0.5).vectAdd(camdown.vectMult(yamnt - 0.5))).normalize();
 			
 			Ray cam_ray (cam_ray_origin, cam_ray_direction);
 
-			vector<double> intersections;
+			
 			
 			/**
 			 *
@@ -187,23 +351,35 @@ void RayCast::Run()
 			 * doubles intersections.
 			 *
 			 */
-			for(index = 0; index < scene_objects.size(); index++) {
+			vector<double> intersections;
+
+			for(int index = 0; index < scene_objects.size(); index++) {
 				intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
 			}
-
+			// -1,0 ou 1 
 			int index_of_winning_object = winningObjectIndex(intersections);
 
-			// if (index_of_winning_object == -1) {
-			// 	// set the backgroung black
-			// 	tempRed[aa_index] = 0;
-			// 	tempGreen[aa_index] = 0;
-			// 	tempBlue[aa_index] = 0;
-			// }
+
+			if (index_of_winning_object == -1) {
+				
+				pixels[thisOne].r = 0;
+				pixels[thisOne].g = 0;
+				pixels[thisOne].b = 0;
+			} else {
+				// index coresponds to an object in our scene
+				if (intersections.at(index_of_winning_object) > accuracy){
+					// determine the position and direction vectors at the point of intersection
+					intersection_position = cam_ray_origin.vectAdd(cam_ray_direction.vectMult(intersections.at(index_of_winning_object)));
+					intersecting_ray_direction = cam_ray_direction;
 
 
-			pixels[thisOne].r = .01;
-			pixels[thisOne].g = .9;
-			pixels[thisOne].b = .02;			
+					intersection_color = getColorAt(intersection_position,intersecting_ray_direction, scene_objects, index_of_winning_object, light_sources, accuracy, ambientlight); 
+
+					pixels[thisOne].r = intersection_color.getColorRed();
+					pixels[thisOne].g = intersection_color.getColorGreen();
+					pixels[thisOne].b = intersection_color.getColorBlue();					
+				}
+			}			
 		}
 	}
 	Savebmp("scene.bmp",width,height,dpi,pixels);	
@@ -296,191 +472,3 @@ void RayCast::Savebmp (const char *filename, unsigned short w, unsigned short h,
 	
 	fclose(f);
 }
-
-/* VECTOR CLASS METHODS =========================================================== */
-
-double Vect::getVectX() { return x; }
-double Vect::getVectY() { return y; }
-double Vect::getVectZ() { return z; }
-
-double Vect::magnitude()
-{
-	return sqrt((x*x) + (y*y) + (z*z));
-}
-
-Vect Vect::normalize ()
-{
-	double magnitude = sqrt((x*x) + (y*y) + (z*z));
-	return Vect (x/magnitude, y/magnitude, z/magnitude);
-}
-
-Vect Vect::negative()
-{
-	return Vect (-x, -y, -z);
-}
-
-double Vect::dotProduct(Vect v)
-{
-	return x*v.getVectX() + y*v.getVectY() + z*v.getVectZ();
-}
-
-Vect Vect::crossProduct(Vect v)
-{
-	return Vect (y*v.getVectZ() - z*v.getVectY(), z*v.getVectX() - x*v.getVectZ(), x*v.getVectY() - y*v.getVectX());
-}
-
-Vect Vect::vectAdd (Vect v)
-{
-	return Vect (x + v.getVectX(), y + v.getVectY(), z + v.getVectZ());
-}
-
-Vect Vect::vectMult (double scalar)
-{
-	return Vect (x*scalar, y*scalar, z*scalar);
-}
-/* ========================================================================== */
-
-
-/* CAMERA CLASS METHODS =========================================================== */
-
-Vect Camera::getCameraPosition () { return campos; }
-Vect Camera::getCameraDirection () { return camdir; }
-Vect Camera::getCameraRight () { return camright; }
-Vect Camera::getCameraDown () { return camdown; }
-
-/* ========================================================================== */
-
-
-
-/* COLOR CLASS METHODS =========================================================== */
-
-double Color::getColorRed() { return red; }
-double Color::getColorGreen() { return green; }
-double Color::getColorBlue() { return blue; }
-double Color::getColorSpecial() { return special; }
-
-double Color::setColorRed(double redValue) { red = redValue; }
-double Color::setColorGreen(double greenValue) { green = greenValue; }
-double Color::setColorBlue(double blueValue) { blue = blueValue; }
-double Color::setColorSpecial(double specialValue) { special = specialValue; }
-
-double Color::brightness() 
-{
-	return(red + green + blue)/3;
-}
-
-Color Color::colorScalar(double scalar) 
-{
-	return Color (red*scalar, green*scalar, blue*scalar, special);
-}
-
-Color Color::colorAdd(Color color) 
-{
-	return Color (red + color.getColorRed(), green + color.getColorGreen(), blue + color.getColorBlue(), special);
-}
-
-Color  Color::colorMultiply(Color color) 
-{
-	return Color (red*color.getColorRed(), green*color.getColorGreen(), blue*color.getColorBlue(), special);
-}
-
-Color Color::colorAverage(Color color) 
-{
-	return Color ((red + color.getColorRed())/2, (green + color.getColorGreen())/2, (blue + color.getColorBlue())/2, special);
-}
-
-Color Color::clip() 
-{
-	double alllight = red + green + blue;
-	double excesslight = alllight - 3;
-	if (excesslight > 0) {
-		red = red + excesslight*(red/alllight);
-		green = green + excesslight*(green/alllight);
-		blue = blue + excesslight*(blue/alllight);
-	}
-	if (red > 1) {red = 1;}
-	if (green > 1) {green = 1;}
-	if (blue > 1) {blue = 1;}
-	if (red < 0) {red = 0;}
-	if (green < 0) {green = 0;}
-	if (blue < 0) {blue = 0;}
-	
-	return Color (red, green, blue, special);
-}
-/* ========================================================================== */
-
-
-
-/* LIGHT CLASS METHODS =========================================================== */
-
-Vect Light::getLightPosition () { return position; }
-Color Light::getLightColor () { return color; }
-
-/* ========================================================================== */
-
-
-
-
-// /* SPHERE CLASS METHODS =========================================================== */
-
-// Color Sphere::getColor () { return color; }
-// Vect Sphere::getSphereCenter () { return center; }
-// double Sphere::getSphereRadius () { return radius; }
-
-// Vect Sphere::getNormalAt(Vect point)
-// {
-// 	// normal always points away from the center of a sphere
-// 	Vect normal_Vect = point.vectAdd(center.negative()).normalize();
-// 	return normal_Vect;
-// }
-// // retorna um valor escalar, que é a distancia entre o ponto de intersecção
-// // e a origem da camera. 
-// double Sphere::indIntersection(Ray ray)
-// {
-// 	Vect ray_origin = ray.getRayOrigin();
-// 	double ray_origin_x = ray_origin.getVectX();
-// 	double ray_origin_y = ray_origin.getVectY();
-// 	double ray_origin_z = ray_origin.getVectZ();
-	
-// 	Vect ray_direction = ray.getRayDirection();
-// 	double ray_direction_x = ray_direction.getVectX();
-// 	double ray_direction_y = ray_direction.getVectY();
-// 	double ray_direction_z = ray_direction.getVectZ();
-	
-// 	Vect sphere_center = center;
-// 	double sphere_center_x = sphere_center.getVectX();
-// 	double sphere_center_y = sphere_center.getVectY();
-// 	double sphere_center_z = sphere_center.getVectZ();
-	
-// 	double a = 1; // normalized
-// 	double b = (2*(ray_origin_x - sphere_center_x)*ray_direction_x) + (2*(ray_origin_y - sphere_center_y)*ray_direction_y) + (2*(ray_origin_z - sphere_center_z)*ray_direction_z);
-// 	double c = pow(ray_origin_x - sphere_center_x, 2) + pow(ray_origin_y - sphere_center_y, 2) + pow(ray_origin_z - sphere_center_z, 2) - (radius*radius);
-	
-// 	double discriminant = b*b - 4*c;
-	
-// 	if (discriminant > 0) {
-// 		/// the ray intersects the sphere
-		
-// 		// the first root
-// 		double root_1 = ((-1*b - sqrt(discriminant))/2) - 0.000001;
-		
-// 		if (root_1 > 0) {
-// 			// the first root is the smallest positive root
-// 			return root_1;
-// 		}
-// 		else {
-// 			// the second root is the smallest positive root
-// 			double root_2 = ((sqrt(discriminant) - b)/2) - 0.000001;
-// 			return root_2;
-// 		}
-// 	}
-// 	else {
-// 		// the ray missed the sphere
-// 		return -1;
-// 	}
-// }
-
-
-
-
-/* ========================================================================== */

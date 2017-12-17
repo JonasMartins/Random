@@ -1,11 +1,11 @@
 #ifndef _Light_H
 #define _Light_H
 
-//#include "Source.h"
+#include "Source.h"
 #include "Vect.h"
 #include "Color.h"
 
-class Light {
+class Light : public Source {
 	Vect position;
 	Color color;
 	
@@ -16,8 +16,8 @@ class Light {
 	Light (Vect, Color);
 	
 	// method functions
-	virtual Vect getLightPosition ();
-	virtual Color getLightColor ();
+	virtual Vect getLightPosition(){return position;}
+	virtual Color getLightColor(){return color; }
 	
 };
 
