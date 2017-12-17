@@ -42,7 +42,6 @@ class Plane : public Object {
 			return -1*b/a;
 		}
 	}
-	
 };
 
 Plane::Plane () {

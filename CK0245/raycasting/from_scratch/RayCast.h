@@ -1,6 +1,9 @@
+#include<iostream>
+#include<string>
+#include<time.h>
 #include<stdio.h>
 #include<stdlib.h>
-#include<iostream>
+
 
 typedef struct 
 {
@@ -16,7 +19,6 @@ class RayCast
 	public:
 		RayCast(); // construtor
 		void Run();
-
 	private:
 
 		void Savebmp(const char *,unsigned short,unsigned short,unsigned short,RGBType *);

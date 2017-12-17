@@ -22,16 +22,69 @@
 
 using namespace std;
 
+// gambiarra 
+int winningObjectIndex(vector<double> object_intersections) {
+	// return the index of the winning intersection
+	int index_of_minimum_value;
+	// prevent unnessary calculations
+	if (object_intersections.size() == 0) {
+		// if there are no intersections
+		return -1;
+	}
+	else if (object_intersections.size() == 1) {
+		// aqui pegamos a primeira intersecção
+		if (object_intersections.at(0) > 0) {
+			// if that intersection is greater than zero then its our index of minimum value
+			return 0;
+		}
+		else {
+			// otherwise the only intersection value is negative
+			return -1;
+		}
+	}
+	// se existem mais de um ponto de intersecção	
+	else {
+		// otherwise there is more than one intersection
+		// first find the maximum value
+		double max = 0;
+		for (int i = 0; i < object_intersections.size(); i++) {
+			if (max < object_intersections.at(i)) {
+				max = object_intersections.at(i);
+			}
+		}
+		// then starting from the maximum value find the minimum positive value
+		if (max > 0) {
+			// we only want positive intersections
+			for (int index = 0; index < object_intersections.size(); index++) {
+				if (object_intersections.at(index) > 0 && object_intersections.at(index) <= max) {
+					max = object_intersections.at(index);
+					index_of_minimum_value = index;
+				}
+			}
+			return index_of_minimum_value;
+		}
+		else {
+			// all the intersections were negative
+			return -1;
+		}
+	}
+}// end of winningObjectIndex
+
 void RayCast::Run()
 {
 	cout<<"rendering..."<<endl;
 	
+	int index;
+	
+
 	unsigned short i;
 	unsigned short j;
 	unsigned short width = 640;
 	unsigned short height = 480;
 	unsigned short dpi = 72;
 	unsigned short thisOne;
+
+	double aspectratio = (double)width/(double)height;
 
 	RGBType *pixels;
 	pixels = new RGBType[width * height]; 
@@ -81,10 +134,73 @@ void RayCast::Run()
 	// -1 distancia para o centro
 	Plane scene_plane (Y, -1, maroon);	
 
+	// colocando os objetos dentro de um array
+	vector<Object*> scene_objects;
+	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
+	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
+
+	double xamnt,yamnt; // um pouco mais a direita, e um pouco mais a esquerda da direção da camera.
 
 	for(i=0;i<width;i++){
 		for(j=0;j<height;j++){
+			
 			thisOne = (j*width) + i;
+
+			/**
+			 *
+			 * xamnt e yamnt para cirar raios para ir para
+			 * a diretira e para a esquerda com relação a
+			 * direção que aponta a camera
+			 *
+			 */
+
+			// no anti-aliasing 
+			if (width > height) {
+				// the image is wider than it is tall
+				xamnt = ((i+0.5)/width)*aspectratio - (((width-height)/(double)height)/2);
+				yamnt = ((height - j) + 0.5)/height;
+			}
+			else if (height > width) {
+				// the imager is taller than it is wide
+				xamnt = (i + 0.5)/ width;
+				yamnt = (((height - j) + 0.5)/height)/aspectratio - (((height - width)/(double)width)/2);
+			}else {
+				// the image is square
+				xamnt = (i + 0.5)/width;
+				yamnt = ((height - j) + 0.5)/height;
+			}
+			// get camera origin 
+			Vect cam_ray_origin = scene_cam.getCameraPosition();
+			// direção que a camera aponta 
+			Vect cam_ray_direction = camdir.vectAdd(camright.vectMult(xamnt - 0.5).vectAdd(camdown.vectMult(yamnt - 0.5))).normalize();
+			
+			Ray cam_ray (cam_ray_origin, cam_ray_direction);
+
+			vector<double> intersections;
+			
+			/**
+			 *
+			 * Loop por todos os obejtos da cena, e usa o metodo para achar a intersecção
+			 * lembrando que o metodo intersecção é implementado por cada objeto separadamente
+			 * ou seja, vai ter um mmétodo para cada tipo de objeto sendo que todos herdam da classe
+			 * Object.h, isso vai retornar um valor, e esse valor é armazenado dentro do vetor de 
+			 * doubles intersections.
+			 *
+			 */
+			for(index = 0; index < scene_objects.size(); index++) {
+				intersections.push_back(scene_objects.at(index)->findIntersection(cam_ray));
+			}
+
+			int index_of_winning_object = winningObjectIndex(intersections);
+
+			// if (index_of_winning_object == -1) {
+			// 	// set the backgroung black
+			// 	tempRed[aa_index] = 0;
+			// 	tempGreen[aa_index] = 0;
+			// 	tempBlue[aa_index] = 0;
+			// }
+
+
 			pixels[thisOne].r = .01;
 			pixels[thisOne].g = .9;
 			pixels[thisOne].b = .02;			
@@ -305,65 +421,64 @@ Color Light::getLightColor () { return color; }
 
 
 
-/* SPHERE CLASS METHODS =========================================================== */
+// /* SPHERE CLASS METHODS =========================================================== */
 
+// Color Sphere::getColor () { return color; }
+// Vect Sphere::getSphereCenter () { return center; }
+// double Sphere::getSphereRadius () { return radius; }
 
-
-Color Sphere::getColor () { return color; }
-Vect Sphere::getSphereCenter () { return center; }
-double Sphere::getSphereRadius () { return radius; }
-
-Vect Sphere::getNormalAt(Vect point)
-{
-	// normal always points away from the center of a sphere
-	Vect normal_Vect = point.vectAdd(center.negative()).normalize();
-	return normal_Vect;
-}
-
-double Sphere::indIntersection(Ray ray)
-{
-	Vect ray_origin = ray.getRayOrigin();
-	double ray_origin_x = ray_origin.getVectX();
-	double ray_origin_y = ray_origin.getVectY();
-	double ray_origin_z = ray_origin.getVectZ();
+// Vect Sphere::getNormalAt(Vect point)
+// {
+// 	// normal always points away from the center of a sphere
+// 	Vect normal_Vect = point.vectAdd(center.negative()).normalize();
+// 	return normal_Vect;
+// }
+// // retorna um valor escalar, que é a distancia entre o ponto de intersecção
+// // e a origem da camera. 
+// double Sphere::indIntersection(Ray ray)
+// {
+// 	Vect ray_origin = ray.getRayOrigin();
+// 	double ray_origin_x = ray_origin.getVectX();
+// 	double ray_origin_y = ray_origin.getVectY();
+// 	double ray_origin_z = ray_origin.getVectZ();
 	
-	Vect ray_direction = ray.getRayDirection();
-	double ray_direction_x = ray_direction.getVectX();
-	double ray_direction_y = ray_direction.getVectY();
-	double ray_direction_z = ray_direction.getVectZ();
+// 	Vect ray_direction = ray.getRayDirection();
+// 	double ray_direction_x = ray_direction.getVectX();
+// 	double ray_direction_y = ray_direction.getVectY();
+// 	double ray_direction_z = ray_direction.getVectZ();
 	
-	Vect sphere_center = center;
-	double sphere_center_x = sphere_center.getVectX();
-	double sphere_center_y = sphere_center.getVectY();
-	double sphere_center_z = sphere_center.getVectZ();
+// 	Vect sphere_center = center;
+// 	double sphere_center_x = sphere_center.getVectX();
+// 	double sphere_center_y = sphere_center.getVectY();
+// 	double sphere_center_z = sphere_center.getVectZ();
 	
-	double a = 1; // normalized
-	double b = (2*(ray_origin_x - sphere_center_x)*ray_direction_x) + (2*(ray_origin_y - sphere_center_y)*ray_direction_y) + (2*(ray_origin_z - sphere_center_z)*ray_direction_z);
-	double c = pow(ray_origin_x - sphere_center_x, 2) + pow(ray_origin_y - sphere_center_y, 2) + pow(ray_origin_z - sphere_center_z, 2) - (radius*radius);
+// 	double a = 1; // normalized
+// 	double b = (2*(ray_origin_x - sphere_center_x)*ray_direction_x) + (2*(ray_origin_y - sphere_center_y)*ray_direction_y) + (2*(ray_origin_z - sphere_center_z)*ray_direction_z);
+// 	double c = pow(ray_origin_x - sphere_center_x, 2) + pow(ray_origin_y - sphere_center_y, 2) + pow(ray_origin_z - sphere_center_z, 2) - (radius*radius);
 	
-	double discriminant = b*b - 4*c;
+// 	double discriminant = b*b - 4*c;
 	
-	if (discriminant > 0) {
-		/// the ray intersects the sphere
+// 	if (discriminant > 0) {
+// 		/// the ray intersects the sphere
 		
-		// the first root
-		double root_1 = ((-1*b - sqrt(discriminant))/2) - 0.000001;
+// 		// the first root
+// 		double root_1 = ((-1*b - sqrt(discriminant))/2) - 0.000001;
 		
-		if (root_1 > 0) {
-			// the first root is the smallest positive root
-			return root_1;
-		}
-		else {
-			// the second root is the smallest positive root
-			double root_2 = ((sqrt(discriminant) - b)/2) - 0.000001;
-			return root_2;
-		}
-	}
-	else {
-		// the ray missed the sphere
-		return -1;
-	}
-}
+// 		if (root_1 > 0) {
+// 			// the first root is the smallest positive root
+// 			return root_1;
+// 		}
+// 		else {
+// 			// the second root is the smallest positive root
+// 			double root_2 = ((sqrt(discriminant) - b)/2) - 0.000001;
+// 			return root_2;
+// 		}
+// 	}
+// 	else {
+// 		// the ray missed the sphere
+// 		return -1;
+// 	}
+// }
 
 
 
