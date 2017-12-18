@@ -22,7 +22,8 @@ class Sphere : public Object {
 	Vect getSphereCenter () { return center; }
 	double getSphereRadius () { return radius; }
 	virtual Color getColor () { return color; }
-	
+
+
 	virtual Vect getNormalAt(Vect point) {
 		// normal always points away from the center of a sphere
 		Vect normal_Vect = point.vectAdd(center.negative()).normalize();

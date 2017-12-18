@@ -20,83 +20,84 @@
 #include"./Plane.h"
 
 using namespace std;
+
+
+
+
+// gambiarra 
+int winningObjectIndex(vector<double> object_intersections) {
+	// return the index of the winning intersection
+	int index_of_minimum_value;
+	// prevent unnessary calculations
+	// if there are no intersections
+	if (object_intersections.size() == 0) {	return -1; }
+		// aqui pegamos a primeira intersecção
+	else if (object_intersections.size() == 1) {
+			// if that intersection is greater than zero then its our index of minimum value
+		if (object_intersections.at(0) > 0) { return 0;}
+		// otherwise the only intersection value is negative
+		else { return -1; }
+	}
+	// se existem mais de um ponto de intersecção	
+	else {
+		// otherwise there is more than one intersection
+		// first find the maximum value
+		double max = 0;
+		for (int i = 0; i < object_intersections.size(); i++) {
+			if (max < object_intersections.at(i)) {
+				max = object_intersections.at(i);
+			}
+		}
+		// then starting from the maximum value find the minimum positive value
+		if (max > 0) {
+			// we only want positive intersections
+			for (int index = 0; index < object_intersections.size(); index++) {
+				if (object_intersections.at(index) > 0 && object_intersections.at(index) <= max) {
+					max = object_intersections.at(index);
+					index_of_minimum_value = index;
+				}
+			}
+			return index_of_minimum_value;
+		}
+		// all the intersections were negative
+		else {	return -1; }
+	}
+}// end of winningObjectIndex	
+
 /**
  *
- * função mais complexa do trabalho.
+ * função mais complexa do trabalho. -> RAYCASTING
  * pega a cor do objeto interseptado, a normal no local de intersecção, loop pelas fontes de luz, 
  * determina em qual direção ir do nosso ponto de intersecção até a fonte de luz, então cria raios para
  * a direção das fontes de luz, se tiver alguma intersecção, a primeira intersecção vai estar com sombra
  *
  */
-Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, vector<Object*> scene_objects, int index_of_winning_object, vector<Source*> light_sources, double accuracy, double ambientlight) {
+Color getColorAtRaycasting(Vect intersection_position, Vect intersecting_ray_direction, vector<Object*> scene_objects, int index_of_winning_object, vector<Source*> light_sources, double accuracy, double ambientlight) {
 	
-	// int reflection_index;
-	// int object_index;
-	// int light_index;
-	// int square;
-
-	// normal e cor do objeto interseptado.
+		// normal e cor do objeto interseptado.
 	Color winning_object_color = scene_objects.at(index_of_winning_object)->getColor();
 	Vect winning_object_normal = scene_objects.at(index_of_winning_object)->getNormalAt(intersection_position);
 	
 	Color final_color = winning_object_color.colorScalar(ambientlight);
 	
-	// if (winning_object_color.getColorSpecial() == 2) {
-	// 	// checkered/tile floor pattern
+	if (winning_object_color.getColorSpecial() == 2) {
+		// checkered/tile floor pattern
 		
-	// 	int square = (int)floor(intersection_position.getVectX()) + (int)floor(intersection_position.getVectZ());
+		int square = (int)floor(intersection_position.getVectX()) + (int)floor(intersection_position.getVectZ());
 		
-	// 	if ((square % 2) == 0) {
-	// 		// black tile
-	// 		winning_object_color.setColorRed(0);
-	// 		winning_object_color.setColorGreen(0);
-	// 		winning_object_color.setColorBlue(0);
-	// 	}
-	// 	else {
-	// 		// white tile
-	// 		winning_object_color.setColorRed(1);
-	// 		winning_object_color.setColorGreen(1);
-	// 		winning_object_color.setColorRed(1);
-	// 	}
-	// }
-	
-	// Color final_color = winning_object_color.colorScalar(ambientlight);
-	
-	// if (winning_object_color.getColorSpecial() > 0 && winning_object_color.getColorSpecial() <= 1) {
-	// 	// reflection from objects with specular intensity
-	// 	double dot1 = winning_object_normal.dotProduct(intersecting_ray_direction.negative());
-	// 	Vect scalar1 = winning_object_normal.vectMult(dot1);
-	// 	Vect add1 = scalar1.vectAdd(intersecting_ray_direction);
-	// 	Vect scalar2 = add1.vectMult(2);
-	// 	Vect add2 = intersecting_ray_direction.negative().vectAdd(scalar2);
-	// 	Vect reflection_direction = add2.normalize();
-		
-	// 	Ray reflection_ray (intersection_position, reflection_direction);
-		
-	// 	// determine what the ray intersects with first
-	// 	vector<double> reflection_intersections;
-		
-	// 	for (int reflection_index = 0; reflection_index < scene_objects.size(); reflection_index++) {
-	// 		reflection_intersections.push_back(scene_objects.at(reflection_index)->findIntersection(reflection_ray));
-	// 	}
-		
-	// 	int index_of_winning_object_with_reflection = winningObjectIndex(reflection_intersections);
-		
-	// 	if (index_of_winning_object_with_reflection != -1) {
-	// 		// reflection ray missed everthing else
-	// 		if (reflection_intersections.at(index_of_winning_object_with_reflection) > accuracy) {
-	// 			// determine the position and direction at the point of intersection with the reflection ray
-	// 			// the ray only affects the color if it reflected off something
-				
-	// 			Vect reflection_intersection_position = intersection_position.vectAdd(reflection_direction.vectMult(reflection_intersections.at(index_of_winning_object_with_reflection)));
-	// 			Vect reflection_intersection_ray_direction = reflection_direction;
-				
-	// 			Color reflection_intersection_color = getColorAt(reflection_intersection_position, reflection_intersection_ray_direction, scene_objects, index_of_winning_object_with_reflection, light_sources, accuracy, ambientlight);
-				
-	// 			final_color = final_color.colorAdd(reflection_intersection_color.colorScalar(winning_object_color.getColorSpecial()));
-	// 		}
-	// 	}
-	// }
+		if ((square % 2) == 0) {
+			// black tile
+			winning_object_color.setColorRed(0);
+			winning_object_color.setColorGreen(0);
+			winning_object_color.setColorBlue(0);
+		}
+		else {
+			// white tile
+			winning_object_color.setColorRed(1);
+			winning_object_color.setColorGreen(1);
+			winning_object_color.setColorRed(1);
+		}
+	}
 	
 	//loop pelas fonte de luz
 	for (int light_index = 0; light_index < light_sources.size(); light_index++) {
@@ -160,53 +161,176 @@ Color getColorAt(Vect intersection_position, Vect intersecting_ray_direction, ve
 		}
 	}
 	
-	return final_color;
+	return final_color.clip();
 }
 
-// gambiarra 
-int winningObjectIndex(vector<double> object_intersections) {
-	// return the index of the winning intersection
-	int index_of_minimum_value;
-	// prevent unnessary calculations
-	// if there are no intersections
-	if (object_intersections.size() == 0) {	return -1; }
-		// aqui pegamos a primeira intersecção
-	else if (object_intersections.size() == 1) {
-			// if that intersection is greater than zero then its our index of minimum value
-		if (object_intersections.at(0) > 0) { return 0;}
-		// otherwise the only intersection value is negative
-		else { return -1; }
+/**
+ *
+ * função mais complexa do trabalho. -> RAYCASTING
+ * pega a cor do objeto interseptado, a normal no local de intersecção, loop pelas fontes de luz, 
+ * determina em qual direção ir do nosso ponto de intersecção até a fonte de luz, então cria raios para
+ * a direção das fontes de luz, se tiver alguma intersecção, a primeira intersecção vai estar com sombra
+ *
+ */
+Color getColorAtRaytracer(Vect intersection_position, Vect intersecting_ray_direction, vector<Object*> scene_objects, int index_of_winning_object, vector<Source*> light_sources, double accuracy, double ambientlight) {
+	
+	// int reflection_index;
+	// int object_index;
+	// int light_index;
+	// int square;
+
+	// normal e cor do objeto interseptado.
+	Color winning_object_color = scene_objects.at(index_of_winning_object)->getColor();
+	Vect winning_object_normal = scene_objects.at(index_of_winning_object)->getNormalAt(intersection_position);
+	
+	Color final_color = winning_object_color.colorScalar(ambientlight);
+	
+	if (winning_object_color.getColorSpecial() == 2) {
+		// checkered/tile floor pattern
+		
+		int square = (int)floor(intersection_position.getVectX()) + (int)floor(intersection_position.getVectZ());
+		
+		if ((square % 2) == 0) {
+			// black tile
+			winning_object_color.setColorRed(0);
+			winning_object_color.setColorGreen(0);
+			winning_object_color.setColorBlue(0);
+		}
+		else {
+			// white tile
+			winning_object_color.setColorRed(1);
+			winning_object_color.setColorGreen(1);
+			winning_object_color.setColorBlue(1);
+		}
 	}
-	// se existem mais de um ponto de intersecção	
-	else {
-		// otherwise there is more than one intersection
-		// first find the maximum value
-		double max = 0;
-		for (int i = 0; i < object_intersections.size(); i++) {
-			if (max < object_intersections.at(i)) {
-				max = object_intersections.at(i);
+	
+	/**
+	 *
+	 * Como ver com o que o raio intersepta primeiramente?, na forma de determinar em qual direção o raio vai
+	 * para haver uma reflexão, a reflexão funciona da seguinte forma: o raio sai da camera, intersepta um objeto na nossa
+	 * cena, reflete desse objeto e intersepta com outro objeto na cena, se esse raio intersepta outro objeto, teremos uma
+	 * do segundo objeto que acabou de ser interseptado, e essa cor vai ser adicionado a cor do nosso primeiro objeto.
+	 *
+	 */
+	
+	// indicando capacidade de reflexão.
+	if (winning_object_color.getColorSpecial() > 0 && winning_object_color.getColorSpecial() <= 1) {
+		
+		// reflection from objects with specular intensity
+		double dot1 = winning_object_normal.dotProduct(intersecting_ray_direction.negative());
+
+		Vect scalar1 = winning_object_normal.vectMult(dot1);
+
+		Vect add1 = scalar1.vectAdd(intersecting_ray_direction);
+
+		Vect scalar2 = add1.vectMult(2);
+
+		Vect add2 = intersecting_ray_direction.negative().vectAdd(scalar2);
+
+		Vect reflection_direction = add2.normalize();
+		
+		Ray reflection_ray (intersection_position, reflection_direction);
+		
+		// determine what the ray intersects with first
+		vector<double> reflection_intersections;
+		
+		for (int reflection_index = 0; reflection_index < scene_objects.size(); reflection_index++) {
+			reflection_intersections.push_back(scene_objects.at(reflection_index)->findIntersection(reflection_ray));
+		}
+		
+		int index_of_winning_object_with_reflection = winningObjectIndex(reflection_intersections);
+		
+		if (index_of_winning_object_with_reflection != -1) {
+			// reflection ray missed everthing else
+			if (reflection_intersections.at(index_of_winning_object_with_reflection) > accuracy) {
+				// determine the position and direction at the point of intersection with the reflection ray
+				// the ray only affects the color if it reflected off something
+				
+				Vect reflection_intersection_position = intersection_position.vectAdd(reflection_direction.vectMult(reflection_intersections.at(index_of_winning_object_with_reflection)));
+				Vect reflection_intersection_ray_direction = reflection_direction;
+				
+				Color reflection_intersection_color = getColorAtRaytracer(reflection_intersection_position, reflection_intersection_ray_direction, scene_objects, index_of_winning_object_with_reflection, light_sources, accuracy, ambientlight);
+				
+				final_color = final_color.colorAdd(reflection_intersection_color.colorScalar(winning_object_color.getColorSpecial()));
 			}
 		}
-		// then starting from the maximum value find the minimum positive value
-		if (max > 0) {
-			// we only want positive intersections
-			for (int index = 0; index < object_intersections.size(); index++) {
-				if (object_intersections.at(index) > 0 && object_intersections.at(index) <= max) {
-					max = object_intersections.at(index);
-					index_of_minimum_value = index;
+	}
+	
+	//loop pelas fonte de luz
+	for (int light_index = 0; light_index < light_sources.size(); light_index++) {
+		
+		Vect light_direction = light_sources.at(light_index)->getLightPosition().vectAdd(intersection_position.negative()).normalize();
+		
+		// coseno do angulo entre dois vetores
+		float cosine_angle = winning_object_normal.dotProduct(light_direction);
+		
+		// test for shadows
+		if (cosine_angle > 0) {
+		
+			bool shadowed = false;
+
+			// distancia da fonte de luz para o nosso ponto de intersecção
+			Vect distance_to_light = light_sources.at(light_index)->getLightPosition().vectAdd(intersection_position.negative()).normalize();
+			
+			float distance_to_light_magnitude = distance_to_light.magnitude();
+
+			// Raio que vai do nosso ponto de interseção para a fonte de luz
+			// testar se o raio intersepta alguma coisa no caminho do ponto de intersecção e a fonte de luz. 
+			// se Sim, siginifca que o ponto de intersecção está sob sombras
+			Ray shadow_ray (intersection_position, light_sources.at(light_index)->getLightPosition().vectAdd(intersection_position.negative()).normalize());
+			
+			vector<double> secondary_intersections;
+			
+			for (int object_index = 0; object_index < scene_objects.size() && shadowed == false; object_index++) {
+				secondary_intersections.push_back(scene_objects.at(object_index)->findIntersection(shadow_ray));
+			}
+			// loop pelas intersecções secundárias, se houver um ponto de intersecção lá, que seja menor que a distancia
+			// da fonte de luz, isso significa que o pixel não está sob sombra.
+			for (int c = 0; c < secondary_intersections.size(); c++) {
+				if (secondary_intersections.at(c) > accuracy) {
+					if (secondary_intersections.at(c) <= distance_to_light_magnitude) {
+						shadowed = true;
+					}
+				break; // se esse break estiver depois dos ifs, apenas serão postas sombras sob o primeiro objeto e não nos outros
 				}
 			}
-			return index_of_minimum_value;
+			
+			if (shadowed == false) {
+				final_color = final_color.colorAdd(winning_object_color.colorMultiply(light_sources.at(light_index)->getLightColor()).colorScalar(cosine_angle));
+				
+				// determinando o valor especial da propriedade do objeto.
+				if (winning_object_color.getColorSpecial() > 0 && winning_object_color.getColorSpecial() <= 1) {
+					// special [0-1]
+					double dot1 = winning_object_normal.dotProduct(intersecting_ray_direction.negative());
+					Vect scalar1 = winning_object_normal.vectMult(dot1);
+					Vect add1 = scalar1.vectAdd(intersecting_ray_direction);
+					Vect scalar2 = add1.vectMult(2);
+					Vect add2 = intersecting_ray_direction.negative().vectAdd(scalar2);
+					Vect reflection_direction = add2.normalize();
+					
+					double specular = reflection_direction.dotProduct(light_direction);
+					if (specular > 0) {
+						specular = pow(specular, 10);
+						final_color = final_color.colorAdd(light_sources.at(light_index)->getLightColor().colorScalar(specular*winning_object_color.getColorSpecial()));
+					}
+				}
+			}
 		}
-		// all the intersections were negative
-		else {	return -1; }
 	}
-}// end of winningObjectIndex
+	
+	return final_color.clip();
+}
+
+
 
 void RayCast::Run()
 {
 	cout<<"rendering..."<<endl;
 	
+	// capturar tempo de execução inicial
+	clock_t t1, t2;
+	t1 = clock();
+
 	// VGA: 640 x 480 pixels;
 	// WVGA: 800 x 480 pixels;
 	// FWVGA: 854 x 480 pixels;
@@ -269,14 +393,18 @@ void RayCast::Run()
 	// Instancia do objeto camera
 	Camera scene_cam (campos, camdir, camright, camdown);
 
+	/* Cores usadas  http://avatar.se/molscript/doc/colour_names.html */
 	Color white_light (1.0, 1.0, 1.0, 0);
 	Color pretty_green (0.5, 1.0, 0.5, 0.3);
-	Color maroon (0.5, 0.25, 0.25, 0);
+	Color maroon (0.5, 0.25, 0.25, 2); // 2 siginifaca criar o padrão quadriculado no piso
 	Color tile_floor (1, 1, 1, 2);
 	Color gray (0.5, 0.5, 0.5, 0);
 	Color black (0.0, 0.0, 0.0, 0);
+	Color paleturquoise( 0.686275, 0.933333, 0.933333,0);
+	Color hotpink(1, 0.411765, 0.705882,0.3);
+	Color ghostwhite(0.972549, 0.972549, 1,0.3);
 
-	Vect light_position (-7,10,-10);
+	Vect light_position (20,20,-10);
 	Light scene_light (light_position, white_light);
 	vector<Source*> light_sources;
 	
@@ -287,6 +415,12 @@ void RayCast::Run()
 	// scene objects
 	Sphere scene_sphere (O, 1, pretty_green);
 	
+	Vect center_sphere2 = Vect(0,0,6);
+	Vect center_sphere3 = Vect(1,1,5);
+
+	Sphere scene_sphere2 (center_sphere2, 1, hotpink);
+	Sphere scene_sphere3 (center_sphere3, 0.6, ghostwhite);
+	
 	// Y representa a normal ao plano
 	// -1 distancia para o centro
 	Plane scene_plane (Y, -1, maroon);	
@@ -294,6 +428,8 @@ void RayCast::Run()
 	// colocando os objetos dentro de um array
 	vector<Object*> scene_objects;
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
+	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere2));
+	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere3));
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
 
 	double xamnt,yamnt; // um pouco mais a direita, e um pouco mais a esquerda da direção da camera.
@@ -359,12 +495,12 @@ void RayCast::Run()
 			// -1,0 ou 1 
 			int index_of_winning_object = winningObjectIndex(intersections);
 
-
+			// pintando o background
 			if (index_of_winning_object == -1) {
 				
-				pixels[thisOne].r = 0;
-				pixels[thisOne].g = 0;
-				pixels[thisOne].b = 0;
+				pixels[thisOne].r = paleturquoise.getColorRed();
+				pixels[thisOne].g = paleturquoise.getColorGreen();
+				pixels[thisOne].b = paleturquoise.getColorBlue();
 			} else {
 				// index coresponds to an object in our scene
 				if (intersections.at(index_of_winning_object) > accuracy){
@@ -372,8 +508,7 @@ void RayCast::Run()
 					intersection_position = cam_ray_origin.vectAdd(cam_ray_direction.vectMult(intersections.at(index_of_winning_object)));
 					intersecting_ray_direction = cam_ray_direction;
 
-
-					intersection_color = getColorAt(intersection_position,intersecting_ray_direction, scene_objects, index_of_winning_object, light_sources, accuracy, ambientlight); 
+					intersection_color = getColorAtRaytracer(intersection_position,intersecting_ray_direction, scene_objects, index_of_winning_object, light_sources, accuracy, ambientlight); 
 
 					pixels[thisOne].r = intersection_color.getColorRed();
 					pixels[thisOne].g = intersection_color.getColorGreen();
@@ -382,7 +517,14 @@ void RayCast::Run()
 			}			
 		}
 	}
+
+	t2 = clock();
+	float diff = ((float)t2 - (float)t1)/1000;
+	cout << diff << " seconds" << endl;
+
 	Savebmp("scene.bmp",width,height,dpi,pixels);	
+
+	delete pixels; // deslocando a memoria
 }
 
 void RayCast::Savebmp (const char *filename, unsigned short w, unsigned short h, unsigned short dpi, RGBType *data) 

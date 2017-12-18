@@ -14,7 +14,7 @@ using namespace std;
 int main(int argc, char **argv)
 {
 	RayCast* ray;
-
+	
 	ray->Run();
 
 	return EXIT_SUCCESS;

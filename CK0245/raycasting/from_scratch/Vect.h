@@ -45,6 +45,18 @@ class Vect {
 	Vect vectMult (double scalar) {
 		return Vect (x*scalar, y*scalar, z*scalar);
 	}
+
+	// mudando algumas coordenadas da posição de um vetor
+	void setVectX(double xx){
+		x = xx;
+	}
+	void setVectY(double yy){
+		y = yy;
+	}
+	void setVectZ(double zz){
+		z = zz;
+	}
+
 };
 
 Vect::Vect () {

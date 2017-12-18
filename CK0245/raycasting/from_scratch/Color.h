@@ -40,7 +40,7 @@ class Color {
 	Color colorAverage(Color color) {
 		return Color ((red + color.getColorRed())/2, (green + color.getColorGreen())/2, (blue + color.getColorBlue())/2, special);
 	}
-	
+	/* Normalizando o valor da luz evitando que passe de 1*/
 	Color clip() {
 		double alllight = red + green + blue;
 		double excesslight = alllight - 3;
