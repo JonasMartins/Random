@@ -18,10 +18,12 @@
 #include"./Source.h"
 #include"./Object.h"
 #include"./Plane.h"
+#include"./Triangle.h"
 
 using namespace std;
 
 
+vector<Object*> scene_objects;
 
 
 // gambiarra 
@@ -321,7 +323,46 @@ Color getColorAtRaytracer(Vect intersection_position, Vect intersecting_ray_dire
 	return final_color.clip();
 }
 
+void makeCube(Vect corner1, Vect corner2, Color color){
+	//corner 1
+	double c1x = corner1.getVectX();
+	double c1y = corner1.getVectY();
+	double c1z = corner1.getVectZ();
 
+	double c2x = corner2.getVectX();
+	double c2y = corner2.getVectY();
+	double c2z = corner2.getVectZ();
+
+	Vect A(c2x, c1z, c1z);
+	Vect B(c2x, c1z, c2z);
+	Vect C(c1x, c1y, c2z);
+	Vect D(c2x, c2y, c1z);
+	Vect E(c1x, c2y, c1z);
+	Vect F(c1x, c2y, c2z);
+
+	//left side
+	scene_objects.push_back(new Triangle(D,A,corner1, color));
+	scene_objects.push_back(new Triangle(corner1,E,D, color));
+	// far side
+	scene_objects.push_back(new Triangle(corner2,B,A, color));
+	scene_objects.push_back(new Triangle(A,D,corner2, color));
+	// right side
+	scene_objects.push_back(new Triangle(F,C,B, color));
+	scene_objects.push_back(new Triangle(B,corner2,F,color));
+
+	// front side
+	scene_objects.push_back(new Triangle(E,corner1,C,color));
+	scene_objects.push_back(new Triangle(C,F,E,color));
+
+	//top
+	scene_objects.push_back(new Triangle(D,E,F,color));
+	scene_objects.push_back(new Triangle(F,corner2,D,color));
+
+	// bottom
+	scene_objects.push_back(new Triangle(corner1,A,B,color));
+	scene_objects.push_back(new Triangle(B,C,D,color));	
+
+}
 
 void RayCast::Run()
 {
@@ -396,13 +437,15 @@ void RayCast::Run()
 	/* Cores usadas  http://avatar.se/molscript/doc/colour_names.html */
 	Color white_light (1.0, 1.0, 1.0, 0);
 	Color pretty_green (0.5, 1.0, 0.5, 0.3);
-	Color maroon (0.5, 0.25, 0.25, 2); // 2 siginifaca criar o padrão quadriculado no piso
+	Color maroon (0.5, 0.25, 0.25, 1); // 2 siginifaca criar o padrão quadriculado no piso
 	Color tile_floor (1, 1, 1, 2);
 	Color gray (0.5, 0.5, 0.5, 0);
 	Color black (0.0, 0.0, 0.0, 0);
 	Color paleturquoise( 0.686275, 0.933333, 0.933333,0);
 	Color hotpink(1, 0.411765, 0.705882,0.3);
 	Color ghostwhite(0.972549, 0.972549, 1,0.3);
+	Color darkorange(1, 0.54902, 0,0);
+
 
 	Vect light_position (20,20,-10);
 	Light scene_light (light_position, white_light);
@@ -418,19 +461,25 @@ void RayCast::Run()
 	Vect center_sphere2 = Vect(0,0,6);
 	Vect center_sphere3 = Vect(1,1,5);
 
-	Sphere scene_sphere2 (center_sphere2, 1, hotpink);
-	Sphere scene_sphere3 (center_sphere3, 0.6, ghostwhite);
+	//Sphere scene_sphere2 (center_sphere2, 1, hotpink);
+	//Sphere scene_sphere3 (center_sphere3, 0.6, ghostwhite);
 	
+	Triangle scene_triangle = Triangle(Vect(0,0,0),Vect(-1,1,0),Vect(0,0,1),darkorange);
+
+
 	// Y representa a normal ao plano
 	// -1 distancia para o centro
-	Plane scene_plane (Y, -1, maroon);	
+	Plane scene_plane (Y, -1, paleturquoise);	
 
 	// colocando os objetos dentro de um array
-	vector<Object*> scene_objects;
-	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
-	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere2));
-	scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere3));
+	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
+	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere2));
+	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere3));
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
+	//scene_objects.push_back(dynamic_cast<Object*>(&scene_triangle));
+	
+	makeCube(Vect(1,1,1), Vect(-1,-1,-1), darkorange);
+
 
 	double xamnt,yamnt; // um pouco mais a direita, e um pouco mais a esquerda da direção da camera.
 	Vect cam_ray_origin;
@@ -498,9 +547,9 @@ void RayCast::Run()
 			// pintando o background
 			if (index_of_winning_object == -1) {
 				
-				pixels[thisOne].r = paleturquoise.getColorRed();
-				pixels[thisOne].g = paleturquoise.getColorGreen();
-				pixels[thisOne].b = paleturquoise.getColorBlue();
+				pixels[thisOne].r = black.getColorRed();
+				pixels[thisOne].g = black.getColorGreen();
+				pixels[thisOne].b = black.getColorBlue();
 			} else {
 				// index coresponds to an object in our scene
 				if (intersections.at(index_of_winning_object) > accuracy){
