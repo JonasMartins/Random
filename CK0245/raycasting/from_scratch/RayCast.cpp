@@ -409,7 +409,7 @@ void RayCast::Run()
 
 	// vetor posição da camera
 	//Vect campos (20, 5, 0);
-	Vect campos (20, 5, 0);
+	Vect campos (14, 6, -2);
 
 	//Vect look_at (20, 0, 20); // padrão
 	Vect look_at (20, 0, 20); // superior
@@ -445,44 +445,110 @@ void RayCast::Run()
 	Color darkorange(1, 0.54902, 0,0);
 
 	Color wine(0.447, 0.184, 0.215,0.0);
+	Color metallic_gold(0.83,0.686,0.215,0.3);
 	
 	// lights
-	Vect light_position2 (25,0,18);
-	Light scene_light2 (light_position2, white_light);
 	vector<Source*> light_sources;
+
+	Vect light_position1 (15,3,3);
+	Vect light_position2 (25,3,18); 
+
+	Light scene_light1 (light_position1, white_light);
+	Light scene_light2 (light_position2, white_light);
+	
 	light_sources.push_back(dynamic_cast<Source*>(&scene_light2));
+	light_sources.push_back(dynamic_cast<Source*>(&scene_light1));
 
 	// parede de fundo
 	Triangle bacgroundWall1 = Triangle(Vect(0,0,20),Vect(35,0,20),Vect(0,15,20),wine);
 	Triangle bacgroundWall2 = Triangle(Vect(0,15,20),Vect(35,0,20),Vect(35,15,20),wine);
  
-	// parede lado direito imagem
-	Triangle rightWall1 = Triangle(Vect(26.5,0,20),Vect(26.5,0,0),Vect(26.5,15,20),wine);
+	 // parede lado direito imagem
+	Triangle rightWall1 = Triangle(Vect(26.5,0,20),Vect(26.5,0,0),Vect(26.5,25,20),wine);
 
-	// temple floor
-	Triangle templeFloor1 = Triangle(Vect(16,0,10),Vect(21,0,10),Vect(21,0,18.66),ghostwhite);
-	Triangle templeFloor2 = Triangle(Vect(16,0,18.66),Vect(16,0,10),Vect(21,0,18.66),ghostwhite);
+	// // temple floor
+	// Triangle templeFloor1 = Triangle(Vect(16,0,10),Vect(21,0,10),Vect(21,0,18.66),ghostwhite);
+	// Triangle templeFloor2 = Triangle(Vect(16,0,18.66),Vect(16,0,10),Vect(21,0,18.66),ghostwhite);
 
-	// temple roof
-	Triangle templeRoof1 = Triangle(Vect(16,3,10),Vect(21,3,10),Vect(21,3,18.66),ghostwhite);
-	Triangle templeRoof2 = Triangle(Vect(16,3,18.66),Vect(16,3,10),Vect(21,3,18.66),ghostwhite);
+	// // temple roof
+	// Triangle templeRoof1 = Triangle(Vect(16,4,10),Vect(21,4,10),Vect(21,4,18.66),ghostwhite);
+	// Triangle templeRoof2 = Triangle(Vect(16,4,18.66),Vect(16,4,10),Vect(21,4,18.66),ghostwhite);
 
+	// // columns direita dianteira
+	// Triangle column1p1 = Triangle(Vect(21,0,10),Vect(21,4,10),Vect(21,4,10.5),ghostwhite);
+	// Triangle column1p2 = Triangle(Vect(21,4,10.5),Vect(21,0,10),Vect(21,0,10.5),ghostwhite);
+	// Triangle column1p3 = Triangle(Vect(21,0,10),Vect(21,4,10),Vect(20.5,4,10),ghostwhite);
+	// Triangle column1p4 = Triangle(Vect(20.5,4,10),Vect(21,0,10),Vect(20.5,0,10),ghostwhite);
+
+
+
+	// // columns direita traseira
+	// Triangle column3p1 = Triangle(Vect(21,0,18.66),Vect(21,4,18.66),Vect(21,4,17.66),ghostwhite);
+	// Triangle column3p2 = Triangle(Vect(21,4,17.66),Vect(21,0,18.66),Vect(21,0,17.66),ghostwhite);
+
+
+	// // columns esquerda dianteira
+	// Triangle column2p1 = Triangle(Vect(16,0,10),Vect(16,4,10),Vect(16,4,10.5),ghostwhite);
+	// Triangle column2p2 = Triangle(Vect(16,4,10.5),Vect(16,0,10),Vect(16,0,10.5),ghostwhite);
+	// Triangle column2p3 = Triangle(Vect(16,0,10),Vect(16,4,10),Vect(16.5,4,10),ghostwhite);
+	// Triangle column2p4 = Triangle(Vect(16.5,4,10),Vect(16,0,10),Vect(16.5,0,10),ghostwhite);
+
+	// // columns esquerda traseira
+	// Triangle column4p1 = Triangle(Vect(16,0,18.66),Vect(16,4,18.66),Vect(16,4,17.66),ghostwhite);
+	// Triangle column4p2 = Triangle(Vect(16,4,17.66),Vect(16,0,18.66),Vect(16,0,17.66),ghostwhite);
+
+	// // temple triengle dome
+	// Triangle dome = Triangle(Vect(21,4,10),Vect(16,4,10),Vect(18.5,5.5,10),ghostwhite);
+
+	// // esfera central no domo
+	// Sphere contral_overal_sphere = Sphere(Vect(18.5,4.75,10),0.4,metallic_gold);
+
+	Vect pico = Vect(18.5,7,10.5);
+
+	// pyramid floor
+	Triangle pyramidFloor1 = Triangle(Vect(15,0,7),Vect(22,0,7),Vect(22,0,14),ghostwhite);
+	Triangle pyramidFloor2 = Triangle(Vect(15,0,14),Vect(15,0,7),Vect(22,0,14),ghostwhite);	
+
+	// pico da piramide: (18.5,7,10.5);
+	Triangle pyramidFace1 = Triangle(Vect(15,0,14),Vect(15,0,7),pico,metallic_gold);
+	Triangle pyramidFace2 = Triangle(Vect(15,0,7),Vect(22,0,7),pico,metallic_gold);
+	Triangle pyramidFace3 = Triangle(pico,Vect(22,0,7),Vect(22,0,14),metallic_gold);
+	Triangle pyramidFace4 = Triangle(Vect(15,0,14),pico,Vect(22,0,14),metallic_gold);		
 
 	// quadriculado
-	//Plane scene_plane (Y, -1, tile_floor);
-	Plane scene_plane (Y, -1, black);
+	Plane scene_plane (Y, -1, tile_floor);
+	//Plane scene_plane (Y, -1, darkorange);
 
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
-	// scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall1));
-	// scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall2));
-	// scene_objects.push_back(dynamic_cast<Object*>(&rightWall1));
-	scene_objects.push_back(dynamic_cast<Object*>(&templeFloor1));
-	scene_objects.push_back(dynamic_cast<Object*>(&templeFloor2));
-	scene_objects.push_back(dynamic_cast<Object*>(&templeRoof1));
-	scene_objects.push_back(dynamic_cast<Object*>(&templeRoof2));
-	
+	scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall1));
+	scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall2));
+	scene_objects.push_back(dynamic_cast<Object*>(&rightWall1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&templeFloor1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&templeFloor2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&templeRoof1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&templeRoof2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column1p1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column1p2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column1p3));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column1p4));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column2p1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column2p2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column2p3));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column2p4));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column3p1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column3p2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column4p1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&column4p2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&dome));
+	// scene_objects.push_back(dynamic_cast<Object*>(&contral_overal_sphere));
+	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFloor1));
+	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFloor2));
+	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace1));
+	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace2));
+	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace3));
+	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace4));
 
-	double xamnt,yamnt; // um pouco mais a direita, e um pouco mais a esquerda da direção da camera.
+	double xamnt,yamnt; 
 	Vect cam_ray_origin;
 	Vect cam_ray_direction;
 	Vect intersection_position;
