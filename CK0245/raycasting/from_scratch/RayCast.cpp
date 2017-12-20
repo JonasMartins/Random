@@ -176,11 +176,6 @@ Color getColorAtRaycasting(Vect intersection_position, Vect intersecting_ray_dir
  */
 Color getColorAtRaytracer(Vect intersection_position, Vect intersecting_ray_direction, vector<Object*> scene_objects, int index_of_winning_object, vector<Source*> light_sources, double accuracy, double ambientlight) {
 	
-	// int reflection_index;
-	// int object_index;
-	// int light_index;
-	// int square;
-
 	// normal e cor do objeto interseptado.
 	Color winning_object_color = scene_objects.at(index_of_winning_object)->getColor();
 	Vect winning_object_normal = scene_objects.at(index_of_winning_object)->getNormalAt(intersection_position);
@@ -323,46 +318,46 @@ Color getColorAtRaytracer(Vect intersection_position, Vect intersecting_ray_dire
 	return final_color.clip();
 }
 
-void makeCube(Vect corner1, Vect corner2, Color color){
-	//corner 1
-	double c1x = corner1.getVectX();
-	double c1y = corner1.getVectY();
-	double c1z = corner1.getVectZ();
+// void makeCube(Vect corner1, Vect corner2, Color color){
+// 	//corner 1
+// 	double c1x = corner1.getVectX();
+// 	double c1y = corner1.getVectY();
+// 	double c1z = corner1.getVectZ();
 
-	double c2x = corner2.getVectX();
-	double c2y = corner2.getVectY();
-	double c2z = corner2.getVectZ();
+// 	double c2x = corner2.getVectX();
+// 	double c2y = corner2.getVectY();
+// 	double c2z = corner2.getVectZ();
 
-	Vect A(c2x, c1z, c1z);
-	Vect B(c2x, c1z, c2z);
-	Vect C(c1x, c1y, c2z);
-	Vect D(c2x, c2y, c1z);
-	Vect E(c1x, c2y, c1z);
-	Vect F(c1x, c2y, c2z);
+// 	Vect A(c2x, c1z, c1z);
+// 	Vect B(c2x, c1z, c2z);
+// 	Vect C(c1x, c1y, c2z);
+// 	Vect D(c2x, c2y, c1z);
+// 	Vect E(c1x, c2y, c1z);
+// 	Vect F(c1x, c2y, c2z);
 
-	//left side
-	scene_objects.push_back(new Triangle(D,A,corner1, color));
-	scene_objects.push_back(new Triangle(corner1,E,D, color));
-	// far side
-	scene_objects.push_back(new Triangle(corner2,B,A, color));
-	scene_objects.push_back(new Triangle(A,D,corner2, color));
-	// right side
-	scene_objects.push_back(new Triangle(F,C,B, color));
-	scene_objects.push_back(new Triangle(B,corner2,F,color));
+// 	//left side
+// 	scene_objects.push_back(new Triangle(D,A,corner1, color));
+// 	scene_objects.push_back(new Triangle(corner1,E,D, color));
+// 	// far side
+// 	scene_objects.push_back(new Triangle(corner2,B,A, color));
+// 	scene_objects.push_back(new Triangle(A,D,corner2, color));
+// 	// right side
+// 	scene_objects.push_back(new Triangle(F,C,B, color));
+// 	scene_objects.push_back(new Triangle(B,corner2,F,color));
 
-	// front side
-	scene_objects.push_back(new Triangle(E,corner1,C,color));
-	scene_objects.push_back(new Triangle(C,F,E,color));
+// 	// front side
+// 	scene_objects.push_back(new Triangle(E,corner1,C,color));
+// 	scene_objects.push_back(new Triangle(C,F,E,color));
 
-	//top
-	scene_objects.push_back(new Triangle(D,E,F,color));
-	scene_objects.push_back(new Triangle(F,corner2,D,color));
+// 	//top
+// 	scene_objects.push_back(new Triangle(D,E,F,color));
+// 	scene_objects.push_back(new Triangle(F,corner2,D,color));
 
-	// bottom
-	scene_objects.push_back(new Triangle(corner1,A,B,color));
-	scene_objects.push_back(new Triangle(B,C,D,color));	
+// 	// bottom
+// 	scene_objects.push_back(new Triangle(corner1,A,B,color));
+// 	scene_objects.push_back(new Triangle(B,C,D,color));	
 
-}
+// }
 
 void RayCast::Run()
 {
@@ -413,9 +408,12 @@ void RayCast::Run()
 	Vect Z (0,0,1);
 
 	// vetor posição da camera
-	Vect campos (3, 1.5, -4);
+	//Vect campos (20, 5, 0);
+	Vect campos (20, 5, 0);
 
-	Vect look_at (0, 0, 0);
+	//Vect look_at (20, 0, 20); // padrão
+	Vect look_at (20, 0, 20); // superior
+	
 	// vector diff between
 	// registra a diferença entre a posição da camera e a posição do look_at
 	Vect diff_btw (campos.getVectX() - look_at.getVectX(), campos.getVectY() - look_at.getVectY(), campos.getVectZ() - look_at.getVectZ());
@@ -446,40 +444,43 @@ void RayCast::Run()
 	Color ghostwhite(0.972549, 0.972549, 1,0.3);
 	Color darkorange(1, 0.54902, 0,0);
 
-
-	Vect light_position (20,20,-10);
-	Light scene_light (light_position, white_light);
+	Color wine(0.447, 0.184, 0.215,0.0);
+	
+	// lights
+	Vect light_position2 (25,0,18);
+	Light scene_light2 (light_position2, white_light);
 	vector<Source*> light_sources;
-	
-	// multiple light sources
-	light_sources.push_back(dynamic_cast<Source*>(&scene_light));
-	
+	light_sources.push_back(dynamic_cast<Source*>(&scene_light2));
 
-	// scene objects
-	Sphere scene_sphere (O, 1, pretty_green);
-	
-	Vect center_sphere2 = Vect(0,0,6);
-	Vect center_sphere3 = Vect(1,1,5);
+	// parede de fundo
+	Triangle bacgroundWall1 = Triangle(Vect(0,0,20),Vect(35,0,20),Vect(0,15,20),wine);
+	Triangle bacgroundWall2 = Triangle(Vect(0,15,20),Vect(35,0,20),Vect(35,15,20),wine);
+ 
+	// parede lado direito imagem
+	Triangle rightWall1 = Triangle(Vect(26.5,0,20),Vect(26.5,0,0),Vect(26.5,15,20),wine);
 
-	//Sphere scene_sphere2 (center_sphere2, 1, hotpink);
-	//Sphere scene_sphere3 (center_sphere3, 0.6, ghostwhite);
-	
-	Triangle scene_triangle = Triangle(Vect(0,0,0),Vect(-1,1,0),Vect(0,0,1),darkorange);
+	// temple floor
+	Triangle templeFloor1 = Triangle(Vect(16,0,10),Vect(21,0,10),Vect(21,0,18.66),ghostwhite);
+	Triangle templeFloor2 = Triangle(Vect(16,0,18.66),Vect(16,0,10),Vect(21,0,18.66),ghostwhite);
+
+	// temple roof
+	Triangle templeRoof1 = Triangle(Vect(16,3,10),Vect(21,3,10),Vect(21,3,18.66),ghostwhite);
+	Triangle templeRoof2 = Triangle(Vect(16,3,18.66),Vect(16,3,10),Vect(21,3,18.66),ghostwhite);
 
 
-	// Y representa a normal ao plano
-	// -1 distancia para o centro
-	Plane scene_plane (Y, -1, paleturquoise);	
+	// quadriculado
+	//Plane scene_plane (Y, -1, tile_floor);
+	Plane scene_plane (Y, -1, black);
 
-	// colocando os objetos dentro de um array
-	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere));
-	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere2));
-	//scene_objects.push_back(dynamic_cast<Object*>(&scene_sphere3));
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
-	//scene_objects.push_back(dynamic_cast<Object*>(&scene_triangle));
+	// scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&rightWall1));
+	scene_objects.push_back(dynamic_cast<Object*>(&templeFloor1));
+	scene_objects.push_back(dynamic_cast<Object*>(&templeFloor2));
+	scene_objects.push_back(dynamic_cast<Object*>(&templeRoof1));
+	scene_objects.push_back(dynamic_cast<Object*>(&templeRoof2));
 	
-	makeCube(Vect(1,1,1), Vect(-1,-1,-1), darkorange);
-
 
 	double xamnt,yamnt; // um pouco mais a direita, e um pouco mais a esquerda da direção da camera.
 	Vect cam_ray_origin;
@@ -547,9 +548,9 @@ void RayCast::Run()
 			// pintando o background
 			if (index_of_winning_object == -1) {
 				
-				pixels[thisOne].r = black.getColorRed();
-				pixels[thisOne].g = black.getColorGreen();
-				pixels[thisOne].b = black.getColorBlue();
+				pixels[thisOne].r = paleturquoise.getColorRed();
+				pixels[thisOne].g = paleturquoise.getColorGreen();
+				pixels[thisOne].b = paleturquoise.getColorBlue();
 			} else {
 				// index coresponds to an object in our scene
 				if (intersections.at(index_of_winning_object) > accuracy){
@@ -557,7 +558,7 @@ void RayCast::Run()
 					intersection_position = cam_ray_origin.vectAdd(cam_ray_direction.vectMult(intersections.at(index_of_winning_object)));
 					intersecting_ray_direction = cam_ray_direction;
 
-					intersection_color = getColorAtRaytracer(intersection_position,intersecting_ray_direction, scene_objects, index_of_winning_object, light_sources, accuracy, ambientlight); 
+					intersection_color = getColorAtRaycasting(intersection_position,intersecting_ray_direction, scene_objects, index_of_winning_object, light_sources, accuracy, ambientlight); 
 
 					pixels[thisOne].r = intersection_color.getColorRed();
 					pixels[thisOne].g = intersection_color.getColorGreen();
