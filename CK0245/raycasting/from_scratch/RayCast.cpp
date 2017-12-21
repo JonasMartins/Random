@@ -318,46 +318,6 @@ Color getColorAtRaytracer(Vect intersection_position, Vect intersecting_ray_dire
 	return final_color.clip();
 }
 
-// void makeCube(Vect corner1, Vect corner2, Color color){
-// 	//corner 1
-// 	double c1x = corner1.getVectX();
-// 	double c1y = corner1.getVectY();
-// 	double c1z = corner1.getVectZ();
-
-// 	double c2x = corner2.getVectX();
-// 	double c2y = corner2.getVectY();
-// 	double c2z = corner2.getVectZ();
-
-// 	Vect A(c2x, c1z, c1z);
-// 	Vect B(c2x, c1z, c2z);
-// 	Vect C(c1x, c1y, c2z);
-// 	Vect D(c2x, c2y, c1z);
-// 	Vect E(c1x, c2y, c1z);
-// 	Vect F(c1x, c2y, c2z);
-
-// 	//left side
-// 	scene_objects.push_back(new Triangle(D,A,corner1, color));
-// 	scene_objects.push_back(new Triangle(corner1,E,D, color));
-// 	// far side
-// 	scene_objects.push_back(new Triangle(corner2,B,A, color));
-// 	scene_objects.push_back(new Triangle(A,D,corner2, color));
-// 	// right side
-// 	scene_objects.push_back(new Triangle(F,C,B, color));
-// 	scene_objects.push_back(new Triangle(B,corner2,F,color));
-
-// 	// front side
-// 	scene_objects.push_back(new Triangle(E,corner1,C,color));
-// 	scene_objects.push_back(new Triangle(C,F,E,color));
-
-// 	//top
-// 	scene_objects.push_back(new Triangle(D,E,F,color));
-// 	scene_objects.push_back(new Triangle(F,corner2,D,color));
-
-// 	// bottom
-// 	scene_objects.push_back(new Triangle(corner1,A,B,color));
-// 	scene_objects.push_back(new Triangle(B,C,D,color));	
-
-// }
 
 void RayCast::Run()
 {
@@ -409,10 +369,10 @@ void RayCast::Run()
 
 	// vetor posição da camera
 	//Vect campos (20, 5, 0);
-	Vect campos (20, 5, -1);
+	Vect campos (10, 10, 10);
 
 	//Vect look_at (20, 0, 20); // padrão
-	Vect look_at (20, 0, 20); // superior
+	Vect look_at (0, 0, 0); // superior
 	
 	// vector diff between
 	// registra a diferença entre a posição da camera e a posição do look_at
@@ -453,13 +413,13 @@ void RayCast::Run()
 	// lights
 	vector<Source*> light_sources;
 
-	Vect light_position1 (15,3,3);
-	Vect light_position2 (25,3,18); 
+	Vect light_position1 (4,7,-7);
+	//Vect light_position2 (25,3,18); 
 
 	Light scene_light1 (light_position1, white_light);
-	Light scene_light2 (light_position2, white_light);
+	//Light scene_light2 (light_position2, white_light);
 	
-	light_sources.push_back(dynamic_cast<Source*>(&scene_light2));
+	//light_sources.push_back(dynamic_cast<Source*>(&scene_light2));
 	light_sources.push_back(dynamic_cast<Source*>(&scene_light1));
 
 	// parede de fundo
@@ -482,8 +442,6 @@ void RayCast::Run()
 	// Triangle column1p2 = Triangle(Vect(21,4,10.5),Vect(21,0,10),Vect(21,0,10.5),ghostwhite);
 	// Triangle column1p3 = Triangle(Vect(21,0,10),Vect(21,4,10),Vect(20.5,4,10),ghostwhite);
 	// Triangle column1p4 = Triangle(Vect(20.5,4,10),Vect(21,0,10),Vect(20.5,0,10),ghostwhite);
-
-
 
 	// // columns direita traseira
 	// Triangle column3p1 = Triangle(Vect(21,0,18.66),Vect(21,4,18.66),Vect(21,4,17.66),ghostwhite);
@@ -525,6 +483,33 @@ void RayCast::Run()
 	Triangle samallPyramidFace3 = Triangle(picoSmallPyramid,Vect(24,0,7),Vect(24,0,11),metallic_gold);
 	Triangle samallPyramidFace4 = Triangle(Vect(24,0,11),picoSmallPyramid,Vect(24,0,11),metallic_gold);
 
+	Vect v1 = Vect(0,0,0);
+	Vect v2 = Vect(2,0,0);
+	Vect v3 = Vect(2,0,2);
+	Vect v4 = Vect(0,0,2);
+	Vect v5 = Vect(0,2,0);
+	Vect v6 = Vect(2,2,0);
+	Vect v7 = Vect(2,2,2);
+	Vect v8 = Vect(0,2,2);
+
+
+	Triangle cuboFace1 = Triangle(v2,v3,v6,metallic_gold);
+	Triangle cuboFace2 = Triangle(v6,v3,v7,metallic_gold);
+	Triangle cuboFace3 = Triangle(v5,v6,v8,metallic_gold);
+	Triangle cuboFace4 = Triangle(v6,v7,v8,metallic_gold);
+
+
+	Triangle cuboFace5 = Triangle(v3,v4,v7,metallic_gold);
+	Triangle cuboFace6 = Triangle(v4,v8,v7,metallic_gold);
+	Triangle cuboFace7 = Triangle(v5,v8,v1,metallic_gold);
+	Triangle cuboFace8 = Triangle(v8,v4,v1,metallic_gold);
+
+
+	Triangle cuboFace9 = Triangle(v1,v4,v3,metallic_gold);
+	Triangle cuboFace10 = Triangle(v1,v3,v2,metallic_gold);
+	Triangle cuboFace11 = Triangle(v1,v6,v5,metallic_gold);
+	Triangle cuboFace12 = Triangle(v1,v2,v6,metallic_gold);
+
 
 	Vect picoSmallPyramid2 = Vect(15,5,20);
 
@@ -552,18 +537,18 @@ void RayCast::Run()
 	Triangle prismFace8 = Triangle(Vect(13,6,14),prismPicDown,Vect(16,6,14),metallic_gold);
 
 
-	Sphere sphere1 = Sphere(Vect(16,1,9),1,mediumblue);
+	Sphere sphere1 = Sphere(Vect(0,0,0),1,mediumblue);
 	Sphere sphere2 = Sphere(Vect(19,1,6),0.5,pretty_green);
 
 	// quadriculado
-	Plane scene_plane (Y, -1, tile_floor);
-	//Plane scene_plane (Y, -1, darkorange);
+	//Plane scene_plane (Y, -1, tile_floor);
+	Plane scene_plane (Y, 0, darkorange);
 
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
 
-	scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall1));
-	scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall2));
-	scene_objects.push_back(dynamic_cast<Object*>(&rightWall1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&rightWall1));
 
 	// scene_objects.push_back(dynamic_cast<Object*>(&templeFloor1));
 	// scene_objects.push_back(dynamic_cast<Object*>(&templeFloor2));
@@ -591,32 +576,49 @@ void RayCast::Run()
 	 // scene_objects.push_back(dynamic_cast<Object*>(&greatPyramidFace3));
 	 // scene_objects.push_back(dynamic_cast<Object*>(&greatPyramidFace4));
 
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace1));
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace2));
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace3));
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace4));
 
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face1));
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face2));
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face3));
-	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face4));
+	// cenario padrão
 
-	scene_objects.push_back(dynamic_cast<Object*>(&sun));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace3));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace4));
+
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face3));
+	// scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face4));
+
+	// scene_objects.push_back(dynamic_cast<Object*>(&sun));
 
 
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace1));
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace2));
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace3));
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace4));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace2));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace3));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace4));
 
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace5));
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace6));
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace7));
-	scene_objects.push_back(dynamic_cast<Object*>(&prismFace8));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace5));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace6));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace7));
+	// scene_objects.push_back(dynamic_cast<Object*>(&prismFace8));
 
-	scene_objects.push_back(dynamic_cast<Object*>(&sphere1));
-	scene_objects.push_back(dynamic_cast<Object*>(&sphere2));
+	//scene_objects.push_back(dynamic_cast<Object*>(&sphere1));
+	// scene_objects.push_back(dynamic_cast<Object*>(&sphere2));
 
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace1));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace2));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace3));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace4));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace5));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace6));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace7));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace8));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace9));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace10));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace11));
+	scene_objects.push_back(dynamic_cast<Object*>(&cuboFace12));
 
 	double xamnt,yamnt; 
 	Vect cam_ray_origin;
@@ -625,6 +627,7 @@ void RayCast::Run()
 	Vect intersecting_ray_direction;
 	
 	Color intersection_color;
+
 
 	for(i=0;i<width;i++){
 
@@ -641,28 +644,30 @@ void RayCast::Run()
 			 */
 
 			// no anti-aliasing 
-			if (width > height) {
-				// the image is wider than it is tall
-				xamnt = ((i+0.5)/width)*aspectratio - (((width-height)/(double)height)/2);
-				yamnt = ((height - j) + 0.5)/height;
-			}
-			else if (height > width) {
-				// the imager is taller than it is wide
-				xamnt = (i + 0.5)/ width;
-				yamnt = (((height - j) + 0.5)/height)/aspectratio - (((height - width)/(double)width)/2);
-			}else {
-				// the image is square
-				xamnt = (i + 0.5)/width;
-				yamnt = ((height - j) + 0.5)/height;
-			}
+			// if (width > height) {
+			// 	// the image is wider than it is tall
+			 	xamnt = ((i+0.5)/width)*aspectratio - (((width-height)/(double)height)/2);
+			 	yamnt = ((height - j) + 0.5)/height;
+			// }
+			// else if (height > width) {
+			// 	// the imager is taller than it is wide
+			// 	xamnt = (i + 0.5)/ width;
+			// 	yamnt = (((height - j) + 0.5)/height)/aspectratio - (((height - width)/(double)width)/2);
+			// }else {
+			// 	// the image is square
+			// 	xamnt = (i + 0.5)/width;
+			// 	yamnt = ((height - j) + 0.5)/height;
+			// }
+
+
+
 			// get camera origin 
 			cam_ray_origin = scene_cam.getCameraPosition();
 			// direção que a camera aponta 
 			cam_ray_direction = camdir.vectAdd(camright.vectMult(xamnt - 0.5).vectAdd(camdown.vectMult(yamnt - 0.5))).normalize();
+			//cam_ray_direction = camdir.vectAdd(camright.vectAdd(camdown)).normalize();
 			
 			Ray cam_ray (cam_ray_origin, cam_ray_direction);
-
-			
 			
 			/**
 			 *

@@ -152,4 +152,4 @@ def chooseExample():
             exec("%s()" % examples[choice-1])
     
 if __name__ == '__main__':
-    testWireframeDisplay3()
+    testSurfaceDisplayWithCube()
