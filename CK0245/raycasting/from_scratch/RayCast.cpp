@@ -409,7 +409,7 @@ void RayCast::Run()
 
 	// vetor posição da camera
 	//Vect campos (20, 5, 0);
-	Vect campos (14, 6, -2);
+	Vect campos (20, 5, -1);
 
 	//Vect look_at (20, 0, 20); // padrão
 	Vect look_at (20, 0, 20); // superior
@@ -446,7 +446,10 @@ void RayCast::Run()
 
 	Color wine(0.447, 0.184, 0.215,0.0);
 	Color metallic_gold(0.83,0.686,0.215,0.3);
-	
+	Color blueviolet(0.5411, 0.1686, 0.8862,0.3);
+	Color gold(1, 0.8431, 0,0.3);
+
+	Color mediumblue(0, 0, 0.80392,0.3);
 	// lights
 	vector<Source*> light_sources;
 
@@ -503,26 +506,65 @@ void RayCast::Run()
 	// // esfera central no domo
 	// Sphere contral_overal_sphere = Sphere(Vect(18.5,4.75,10),0.4,metallic_gold);
 
-	Vect pico = Vect(18.5,7,10.5);
+	Vect picoGreatPyramid = Vect(18.5,7,10.5);
 
 	// pyramid floor
 	Triangle pyramidFloor1 = Triangle(Vect(15,0,7),Vect(22,0,7),Vect(22,0,14),ghostwhite);
 	Triangle pyramidFloor2 = Triangle(Vect(15,0,14),Vect(15,0,7),Vect(22,0,14),ghostwhite);	
 
-	// pico da piramide: (18.5,7,10.5);
-	Triangle pyramidFace1 = Triangle(Vect(15,0,14),Vect(15,0,7),pico,metallic_gold);
-	Triangle pyramidFace2 = Triangle(Vect(15,0,7),Vect(22,0,7),pico,metallic_gold);
-	Triangle pyramidFace3 = Triangle(pico,Vect(22,0,7),Vect(22,0,14),metallic_gold);
-	Triangle pyramidFace4 = Triangle(Vect(15,0,14),pico,Vect(22,0,14),metallic_gold);		
+	// picoGreatPyramid da piramide: (18.5,7,10.5);
+	Triangle greatPyramidFace1 = Triangle(Vect(15,0,14),Vect(15,0,7),picoGreatPyramid,metallic_gold);
+	Triangle greatPyramidFace2 = Triangle(Vect(15,0,7),Vect(22,0,7),picoGreatPyramid,metallic_gold);
+	Triangle greatPyramidFace3 = Triangle(picoGreatPyramid,Vect(22,0,7),Vect(22,0,14),metallic_gold);
+	Triangle greatPyramidFace4 = Triangle(Vect(15,0,14),picoGreatPyramid,Vect(22,0,14),metallic_gold);		
+
+	Vect picoSmallPyramid = Vect(22,4,9); // nice 24,4,9
+
+	Triangle samallPyramidFace1 = Triangle(Vect(20,0,11),Vect(20,0,7),picoSmallPyramid,metallic_gold);
+	Triangle samallPyramidFace2 = Triangle(Vect(20,0,7),Vect(24,0,7),picoSmallPyramid,hotpink);
+	Triangle samallPyramidFace3 = Triangle(picoSmallPyramid,Vect(24,0,7),Vect(24,0,11),metallic_gold);
+	Triangle samallPyramidFace4 = Triangle(Vect(24,0,11),picoSmallPyramid,Vect(24,0,11),metallic_gold);
+
+
+	Vect picoSmallPyramid2 = Vect(15,5,20);
+
+	Triangle samallPyramid2Face1 = Triangle(Vect(10,0,20),Vect(15,0,15),picoSmallPyramid2,paleturquoise);
+	Triangle samallPyramid2Face2 = Triangle(Vect(15,0,15),Vect(20,0,20),picoSmallPyramid2,maroon);
+	Triangle samallPyramid2Face3 = Triangle(picoSmallPyramid2,Vect(20,0,20),Vect(15,0,25),metallic_gold);
+	Triangle samallPyramid2Face4 = Triangle(Vect(10,0,20),picoSmallPyramid2,Vect(15,0,25),metallic_gold);
+
+	Sphere sun = Sphere(Vect(24,8,20),1,ghostwhite);
+
+
+	Vect prismPicUp = Vect(14.5,8,12.5);
+	Vect prismPicDown = Vect(14.5,4,12.5);
+
+	// 1-4 up
+	Triangle prismFace1 = Triangle(Vect(13,6,14),Vect(13,6,11),prismPicUp,maroon);
+	Triangle prismFace2 = Triangle(Vect(13,6,11),Vect(16,6,11),prismPicUp,blueviolet);
+	Triangle prismFace3 = Triangle(prismPicUp,Vect(16,6,11),Vect(16,6,14),black);
+	Triangle prismFace4 = Triangle(Vect(13,6,14),prismPicUp,Vect(16,6,14),metallic_gold);
+
+	// 5-8 down
+	Triangle prismFace5 = Triangle(Vect(13,6,14),Vect(13,6,11),prismPicDown,ghostwhite);
+	Triangle prismFace6 = Triangle(Vect(13,6,11),Vect(16,6,11),prismPicDown,paleturquoise);
+	Triangle prismFace7 = Triangle(prismPicDown,Vect(16,6,11),Vect(16,6,14),gold);
+	Triangle prismFace8 = Triangle(Vect(13,6,14),prismPicDown,Vect(16,6,14),metallic_gold);
+
+
+	Sphere sphere1 = Sphere(Vect(16,1,9),1,mediumblue);
+	Sphere sphere2 = Sphere(Vect(19,1,6),0.5,pretty_green);
 
 	// quadriculado
 	Plane scene_plane (Y, -1, tile_floor);
 	//Plane scene_plane (Y, -1, darkorange);
 
 	scene_objects.push_back(dynamic_cast<Object*>(&scene_plane));
+
 	scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall1));
 	scene_objects.push_back(dynamic_cast<Object*>(&bacgroundWall2));
 	scene_objects.push_back(dynamic_cast<Object*>(&rightWall1));
+
 	// scene_objects.push_back(dynamic_cast<Object*>(&templeFloor1));
 	// scene_objects.push_back(dynamic_cast<Object*>(&templeFloor2));
 	// scene_objects.push_back(dynamic_cast<Object*>(&templeRoof1));
@@ -541,12 +583,40 @@ void RayCast::Run()
 	// scene_objects.push_back(dynamic_cast<Object*>(&column4p2));
 	// scene_objects.push_back(dynamic_cast<Object*>(&dome));
 	// scene_objects.push_back(dynamic_cast<Object*>(&contral_overal_sphere));
-	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFloor1));
-	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFloor2));
-	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace1));
-	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace2));
-	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace3));
-	 scene_objects.push_back(dynamic_cast<Object*>(&pyramidFace4));
+	 
+	 // scene_objects.push_back(dynamic_cast<Object*>(&pyramidFloor1));
+	 // scene_objects.push_back(dynamic_cast<Object*>(&pyramidFloor2));
+	 // scene_objects.push_back(dynamic_cast<Object*>(&greatPyramidFace1));
+	 // scene_objects.push_back(dynamic_cast<Object*>(&greatPyramidFace2));
+	 // scene_objects.push_back(dynamic_cast<Object*>(&greatPyramidFace3));
+	 // scene_objects.push_back(dynamic_cast<Object*>(&greatPyramidFace4));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace1));
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace2));
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace3));
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramidFace4));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face1));
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face2));
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face3));
+	scene_objects.push_back(dynamic_cast<Object*>(&samallPyramid2Face4));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&sun));
+
+
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace1));
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace2));
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace3));
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace4));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace5));
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace6));
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace7));
+	scene_objects.push_back(dynamic_cast<Object*>(&prismFace8));
+
+	scene_objects.push_back(dynamic_cast<Object*>(&sphere1));
+	scene_objects.push_back(dynamic_cast<Object*>(&sphere2));
+
 
 	double xamnt,yamnt; 
 	Vect cam_ray_origin;
