@@ -17,13 +17,15 @@ struct node
     void *father ;
 } ;
 
+node * new_node();
+void splite(node *node );
 
 extern int node_count ;
 extern int splite_count ;
 extern void start() ;
-extern bool insert( int key , void *value ) ;
-extern bool delete_in_bpt( int key ) ;
-// extern char *query_in_bpt( int key ) ;
+extern bool insert_bpt( int key , void *value ) ;
+extern bool delete_bpt( int key ) ;
+extern char *query_bpt( int key ) ;
 
 
 #endif
