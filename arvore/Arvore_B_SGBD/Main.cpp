@@ -20,4 +20,7 @@ void menu()
 int main(int argc, char **argv )
 {
 	menu();
+	start();
+	char * a = (char*)"test";
+	insert_bpt(1,a);
 }

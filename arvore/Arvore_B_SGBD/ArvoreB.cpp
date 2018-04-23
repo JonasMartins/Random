@@ -20,6 +20,8 @@ void start()
     root->is_leaf = true ;
     node_count = 0 ;
     splite_count = 0 ;
+
+    cout<<"Start build first node, the Tree Root"<<endl;
 }
 
 node * new_node()
