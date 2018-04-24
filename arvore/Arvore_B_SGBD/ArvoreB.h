@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <typeinfo>
 
 const int M = 4 ; // comprimento do no 
 
@@ -19,6 +20,7 @@ struct node
 
 node * new_node();
 void splite(node *node );
+void printNode(node *node );
 
 extern int node_count ;
 extern int splite_count ;

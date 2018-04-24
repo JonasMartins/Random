@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <typeinfo>
 #include "ArvoreB.h"
 using namespace std;
 
@@ -105,7 +106,8 @@ void split( node *_node )
 }
 
 void insert_node( node *node , int key , void *value )
-{
+{   
+    char * buffer;
     int x = 0 ;
     while ( x < node -> key_num && node -> key[ x ] < key ) x ++ ;
     for ( int i = node -> key_num ; i > x ; i -- )
@@ -114,8 +116,13 @@ void insert_node( node *node , int key , void *value )
         node -> pointer[ i ] = node -> pointer[ i - 1 ] ;
     node -> key[ x ] = key ;
     node -> pointer[ x + 1 ] = value ;
+    cout << "x: "<< x <<endl;
+    buffer = (char *)node->pointer[ x + 1 ]; 
+
+    printf("%s%s\n","pointer x+1: ",buffer);
     node -> key_num ++ ;
 
+    printNode(node);
     if ( node -> key_num == M ) // split
         split( node ) ;
 }
@@ -130,13 +137,13 @@ void delete_node(node *node , int key )
         node -> pointer[ i ] = node -> pointer[ i + 1 ] ;
     node -> key_num -- ;
 }
-
+// value ponteiro para void
 bool insert_bpt( int key , void *value )
 {
     node *leaf = find_leaf( key ) ;
-    for ( int i = 0 ; i < leaf -> key_num ; i ++ )
-        if ( key == leaf -> key[ i ] )
-            return false ;
+    for (int i=0; i < leaf->key_num; i++ )
+        if ( key == leaf->key[ i ] )
+            return false ; 
     insert_node( leaf , key , value ) ;
     return true ;
 }
@@ -160,4 +167,12 @@ char * query_bpt( int key )
         if ( key == leaf -> key[ i ] )
             return ( char * ) leaf -> pointer[ i + 1 ] ;
     return NULL ;
+}
+
+void printNode(node *node){
+    printf("Node info:\n");
+    printf("%s%d\n","is_leaf: ",node->is_leaf );
+    printf("%s%d\n","is_root: ",node->is_root );
+    printf("%s%d\n","key_num: ",node->key_num );
+    //cout << "TYPE: "<< typeid(node->pointer[4]).name() << endl;
 }
