@@ -24,13 +24,17 @@ int main(int argc, char **argv )
 {
 	menu();
 	start();
-	char * a = (char*)"__a";
-	char * b = (char*)"__b";
-	char * c = (char*)"__c";
-	//char * d = (char*)"__d";
+	char * a = (char*)"__8";
+	char * b = (char*)"__5";
+	char * c = (char*)"__1";
+	char * d = (char*)"__7";
 
 	insert_bpt(1,a);
 	insert_bpt(2,b);
 	insert_bpt(3,c);
-	//insert_bpt(4,d);
+	insert_bpt(4,d);
+
+	//showSearch(2);
+	//showDelete(2);
+
 }

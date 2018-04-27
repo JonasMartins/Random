@@ -60,12 +60,15 @@ void split( node *_node )
   //node * fatther = (node*)malloc(sizeof(node));
   fatther = new_node();
   splite_count ++ ;
-  cout << endl << "split!: | "<< _node->key_num<<" | "<< _node->key[0]<<" | "<< _node->key[1]<<endl;
+  cout << endl << "split!: | ";//<< _node->key_num<<" | "<< _node->key[0]<<" | "<< _node->key[1]<<endl;
   nodd = new_node();
 
   int mid_key = _node->key[ M / 2 ] ;
+  //cout<<"mid_key: "<<mid_key<<endl;
 
   nodd->key_num = M - M / 2 - 1 ;
+  //cout<<"nodd->key_num: "<<nodd->key_num<<endl;
+
   for ( int i = 0 ; i < nodd->key_num ; i ++ )
   {
     nodd->key[ i ] = _node->key[ i + ( M / 2 + 1 ) ] ;
@@ -99,13 +102,12 @@ void split( node *_node )
     nodd->father = _node->father;
     insert_node( (node*)_node->father,mid_key,(void *)nodd ) ;
   }
+  //fatther = (node*)_node->father
   
-  cout << "midnum: | " << mid_key << " |"<<endl;
-  
-  cout << "midnum: " << mid_key << endl;
-  cout << "father: " << (( node * )_node -> father )-> key_num << ' '<< ((node*)_node -> father )-> key[ 0 ] << endl;
-  cout << "node: " << _node -> key_num << ' ' << _node -> key[ 0 ] << ' ' << _node -> key[ 1 ] << endl;
-  cout << "nodd: " << nodd -> key_num << ' ' << nodd -> key[ 0 ] << ' ' << nodd -> key[ 1 ] << endl << endl ;
+  // cout << "midnum: " << mid_key << endl;
+  // cout << "father: " << (( node * )_node -> father )-> key_num << ' '<< ((node*)_node -> father )-> key[ 0 ] << endl;
+  // cout << "node: " << _node -> key_num << ' ' << _node -> key[ 0 ] << ' ' << _node -> key[ 1 ] << endl;
+  // cout << "nodd: " << nodd -> key_num << ' ' << nodd -> key[ 0 ] << ' ' << nodd -> key[ 1 ] << endl << endl ;
 
   printNode(_node);
   printNode(nodd);
@@ -151,11 +153,16 @@ void insert_node( node *node , int key , void *value )
 
   //cout <<"pointer_with_x: "<< x+1 << node->pointer[x+1]<<endl;
   //printf("%s%s\n","pointer_with_x: ",node->pointer[x+1] );
+  
   node -> key_num ++ ;
+  
   printNode(node);
+
   //cout << "TYPE: "<< typeid(node->pointer[x+1]).name() << endl;
   if (node->key_num==M) // split
       split( node ) ;
+
+  
 }
 
 void delete_node(node *node , int key )
@@ -181,14 +188,31 @@ bool insert_bpt( int key , void *value )
 
 bool delete_bpt( int key )
 {
-    node *leaf = find_leaf( key ) ;
-    for ( int i = 0 ; i < leaf -> key_num ; i ++ )
-        if ( key == leaf -> key[ i ] )
-        {
-            delete_node( leaf , key ) ;
-            return true ;
-        }
-    return false ;
+  node *leaf = find_leaf( key ) ;
+  for ( int i = 0 ; i < leaf -> key_num ; i ++ )
+      if ( key == leaf -> key[ i ] )
+      {
+        delete_node( leaf , key ) ;
+        return true ;
+      }
+  return false ;
+}
+
+void showDelete(int key)
+{
+  if(delete_bpt(key))
+    printf("%s%d%s\n","Key with value: ",key," has been deleted!");
+  else
+    printf("%s\n","Key was not deleted, probably was not found!");
+}
+
+void showSearch(int key)
+{
+  const char * buffer = "Not found!";
+  cout<<"Search for value of key with node: "<<key<<endl;
+  buffer = query_bpt(key);
+  printf("%s\n", buffer);
+
 }
 
 char * query_bpt( int key )
@@ -208,7 +232,7 @@ void printNode(node *node)
   printf("%s%d\n","is_leaf: ",node->is_leaf );
   printf("%s%d\n","is_root: ",node->is_root );
   printf("%s%d\n%s\n","key_num: ",node->key_num,"=======================" );
-  for(int j=0;j<=2;j++){
+  for(int j=0;j<M;j++){
     try {
       buffer = (char *)node->pointer[j];
       printf("%s%d%s%s\n","pointer: ",j," -> ",buffer);

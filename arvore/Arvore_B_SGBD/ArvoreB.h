@@ -18,6 +18,8 @@ struct node {
 };
 
 node * new_node();
+void showSearch(int key);
+void showDelete(int key);
 void splite(node * node);
 void printNode(node * node);
 
