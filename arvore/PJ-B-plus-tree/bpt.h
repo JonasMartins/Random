@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-const int M = 21 ;
+const int M = 3 ;
 
 /*
 struct data_node
@@ -25,6 +25,8 @@ struct bpt_node
     void *pointer[ M + 1 ] ;
     void *father ;
 } ;
+
+bpt_node *new_bpt_node();
 
 extern int node_count ;
 extern int splite_count ;

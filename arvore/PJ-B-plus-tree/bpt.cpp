@@ -67,7 +67,7 @@ void insert_in_node( bpt_node *node , int key , void *value ) ;
 void split( bpt_node *node )
 {
     splite_count ++ ;
-    //cout << endl << "split!:" << node -> key_num << ' ' << node -> key[ 0 ] << ' ' << node -> key[ 1 ] << ' ' << node -> key[ 2 ] << endl;
+    cout << endl << "split!:" << node -> key_num << ' ' << node -> key[ 0 ] << ' ' << node -> key[ 1 ] << ' ' << node -> key[ 2 ] << endl;
     bpt_node *nodd = new_bpt_node() ;
     int mid_key = node -> key[ M / 2 ] ;
 
@@ -105,12 +105,12 @@ void split( bpt_node *node )
         nodd -> father = node -> father ;
         insert_in_node( ( bpt_node * ) node -> father , mid_key , ( void *) nodd ) ;
     }
-    /*
+    
     cout << "midnum: " << mid_key << endl;
     cout << "father: " << (( bpt_node * )node -> father )-> key_num << ' '<< ((bpt_node*)node -> father )-> key[ 0 ] << endl;
     cout << "node: " << node -> key_num << ' ' << node -> key[ 0 ] << ' ' << node -> key[ 1 ] << endl;
     cout << "nodd: " << nodd -> key_num << ' ' << nodd -> key[ 0 ] << ' ' << nodd -> key[ 1 ] << endl << endl ;
-    */
+    
 }
 
 void insert_in_node( bpt_node *node , int key , void *value )

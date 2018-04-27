@@ -6,7 +6,7 @@
 #include <vector> 
 #include <typeinfo>
 
-  const int M = 4; // comprimento do no 
+const int M = 3; // max comprimento do no 
 
 struct node {
   bool is_leaf;

@@ -3,6 +3,8 @@
 #include <cstring>
 #include "bpt.h"
 
+// https://github.com/gugugupan/PJ-B-plus-tree
+
 using namespace std;
 
 int insert_count ;
@@ -85,3 +87,43 @@ int main()
 
     return 0;
 }
+
+
+// #include <iostream>
+// #include <cstdio>
+// #include <cstring>
+// #include <typeinfo>
+
+// #include "bpt.h"
+
+// using namespace std;
+
+// int insert_count ;
+
+// void menu()
+// {
+//     printf( "Menu:\n" ) ;
+//     printf( "Inserir: insert [key] [value]\n" ) ;
+//     printf( "Remover: remove [key]\n" ) ;
+//     printf( "Consulta: query [key]\n" ) ;
+// }
+
+// // g++ -lstdc++ ArvoreB.cpp -o ArvoreB Main.cpp -o Main.exe
+// // g++ ArvoreB.cpp -o ArvoreB Main.cpp -o Main.exe
+
+// // g++ bpt.cpp -o bpt main.cpp -o main.exe
+
+// int main(int argc, char **argv )
+// {
+//     menu();
+//     initial_bpt();
+//     char * a = (char*)"__a";
+//     char * b = (char*)"__b";
+//     char * c = (char*)"__c";
+//     //char * d = (char*)"__d";
+
+//     insert_in_bpt(1,a);
+//     insert_in_bpt(2,b);
+//     insert_in_bpt(3,c);
+//     //insert_in_bpt(4,d);
+// }

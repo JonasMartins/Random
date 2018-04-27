@@ -7,6 +7,8 @@ using namespace std;
 
 node *root ;
 node * nodd;
+node * fatther;
+
 int node_count ;
 int splite_count ;
 
@@ -53,12 +55,13 @@ node *find_leaf( int key )
   return now ;
 }
 
-
 void split( node *_node )
 {   
+  //node * fatther = (node*)malloc(sizeof(node));
+  fatther = new_node();
   splite_count ++ ;
-  cout << endl << "split!:" << _node->key_num << ' ' << _node->key[ 0 ] << ' ' << _node->key[ 1 ] << ' ' << _node->key[ 2 ] << endl;
-  nodd = new_node() ;
+  cout << endl << "split!: | "<< _node->key_num<<" | "<< _node->key[0]<<" | "<< _node->key[1]<<endl;
+  nodd = new_node();
 
   int mid_key = _node->key[ M / 2 ] ;
 
@@ -97,16 +100,32 @@ void split( node *_node )
     insert_node( (node*)_node->father,mid_key,(void *)nodd ) ;
   }
   
+  cout << "midnum: | " << mid_key << " |"<<endl;
+  
   cout << "midnum: " << mid_key << endl;
-  cout << "father: " << (_node->father )<< ' ' << _node->key_num << ' '<< (_node -> father )<< ' ' << _node->key[ 0 ] << endl;
-  cout << "node: " << _node->key_num << ' ' << _node -> key[ 0 ] << ' ' << _node -> key[ 1 ] << endl;
-  cout << "nodd: " << nodd->key_num << ' ' << nodd -> key[ 0 ] << ' ' << nodd -> key[ 1 ] << endl << endl ;
+  cout << "father: " << (( node * )_node -> father )-> key_num << ' '<< ((node*)_node -> father )-> key[ 0 ] << endl;
+  cout << "node: " << _node -> key_num << ' ' << _node -> key[ 0 ] << ' ' << _node -> key[ 1 ] << endl;
+  cout << "nodd: " << nodd -> key_num << ' ' << nodd -> key[ 0 ] << ' ' << nodd -> key[ 1 ] << endl << endl ;
+
+  printNode(_node);
+  printNode(nodd);
+
+  //cout<<"left->father: \n";
+  // fatther = (node*)_node->father;
+  // printNode(fatther);
+  // cout<<"right->father: \n";
+  // fatther = (node*)nodd->father;
+  // printNode(fatther);
+  // cout<<"left: \n";
+  // printNode(_node);
+  // cout<<"right: \n";
+  // printNode(nodd);
     
 }
 
 void insert_node( node *node , int key , void *value )
 {   
-  char * buffer;
+  //char * buffer;
   int x = 0 ;
   while (x < node->key_num && node->key[x]<key) x ++;
   for (int i=node->key_num; i>x; i--)
@@ -115,25 +134,27 @@ void insert_node( node *node , int key , void *value )
     node->pointer[i] = node->pointer[i-1];
   node->key[ x ] = key ;
   node->pointer[ x + 1 ] = value ;
-  cout << "x: "<< x <<endl;
-  //buffer = (char *)node->pointer[x+1]; 
 
-  // printf("%s%s\n","pointer x+1: ",buffer);
-  for(int j=0;j<=x+1;j++){
-    try {
-      buffer = (char *)node->pointer[j];
-      printf("%s%d%s%s\n","pointer: ",j," -> ",buffer);
-    }catch(const std::exception &exc){
-      std::cerr << exc.what(); 
-    }
-  }
+  cout << "\n*****************************************"<<endl;
+  // cout << "length: "<< x+1 <<endl;
+  // //buffer = (char *)node->pointer[x+1]; 
+
+  // // printf("%s%s\n","pointer x+1: ",buffer);
+  // for(int j=0;j<=x+1;j++){
+  //   try {
+  //     buffer = (char *)node->pointer[j];
+  //     printf("%s%d%s%s\n","pointer: ",j," -> ",buffer);
+  //   }catch(const std::exception &exc){
+  //     std::cerr << exc.what(); 
+  //   }
+  // }
 
   //cout <<"pointer_with_x: "<< x+1 << node->pointer[x+1]<<endl;
   //printf("%s%s\n","pointer_with_x: ",node->pointer[x+1] );
   node -> key_num ++ ;
   printNode(node);
   //cout << "TYPE: "<< typeid(node->pointer[x+1]).name() << endl;
-  if ( node -> key_num == M ) // split
+  if (node->key_num==M) // split
       split( node ) ;
 }
 
@@ -180,10 +201,21 @@ char * query_bpt( int key )
 }
 
 void printNode(node *node)
-{
-  printf("Node info:\n");
+{ 
+  char * buffer;
+  //int x = 0 ;
+  printf("\n=======================\nNode info:\n");
   printf("%s%d\n","is_leaf: ",node->is_leaf );
   printf("%s%d\n","is_root: ",node->is_root );
-  printf("%s%d\n","key_num: ",node->key_num );
+  printf("%s%d\n%s\n","key_num: ",node->key_num,"=======================" );
+  for(int j=0;j<=2;j++){
+    try {
+      buffer = (char *)node->pointer[j];
+      printf("%s%d%s%s\n","pointer: ",j," -> ",buffer);
+    }catch(const std::exception &exc){
+      std::cerr << exc.what(); 
+    }
+  }
+  cout << "*****************************************\n\n";
   //cout << "TYPE: "<< typeid(node->pointer[4]).name() << endl;
 }
