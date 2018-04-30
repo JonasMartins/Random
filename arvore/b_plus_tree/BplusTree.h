@@ -5,10 +5,10 @@ using namespace std;
 
 struct node
 {
-    int *data;
-    node **child_ptr;
-    bool leaf;
-    int n;
+  int *data; // array com os valores dos espaços, caixas
+  node **child_ptr; // lista de graus +1 ponteiros que apontam para outros nós
+  bool leaf; // boolean para saber se este nó é folha 
+  int n; // contador de espaços preenchidos do nó
 };
 
 class BplusTree 
@@ -16,7 +16,7 @@ class BplusTree
 
 public:
 
-	BplusTree();
+	BplusTree(int);
 	
 	void traverse(node *);
 	void sort(int *,int);
@@ -28,8 +28,9 @@ public:
 	node * init();
 
 private:
+	int degree;
 	node *root = NULL;
-	node *np = NULL;
+	node *np = NULL; 
 	node *x = NULL;
 
 };

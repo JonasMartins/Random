@@ -12,7 +12,8 @@ int main(int argc,char **argv){
   cout<<"enter the no of elements to be inserted\n";
   cin>>n;
 
-  BplusTree tree;
+  // order
+  BplusTree tree(5);
 
   tree.run(n);
 

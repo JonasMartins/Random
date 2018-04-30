@@ -2,7 +2,10 @@
 #include<iostream>
 #include"./BplusTree.h"
 
-BplusTree::BplusTree() { }
+BplusTree::BplusTree(int degree_size) 
+{
+	degree = degree_size;
+}
 
 void BplusTree::run(int n)
 {
@@ -24,11 +27,11 @@ node * BplusTree::init()
 {
   int i;
   np = new node;
-  np->data = new int[5];
-  np->child_ptr = new node *[6];
+  np->data = new int[degree]; // array of degree spaces
+  np->child_ptr = new node *[degree+1]; // aray of degree + 1 spaces
   np->leaf = true;
   np->n = 0;
-  for (i = 0; i < 6; i++)
+  for (i = 0; i < degree+1; i++)
   {
   	np->child_ptr[i] = NULL;
   }
@@ -43,7 +46,7 @@ void BplusTree::traverse(node *p)
   {
     if (p->leaf == false)
     {
-        traverse(p->child_ptr[i]);
+    	traverse(p->child_ptr[i]);
     }
     cout << " " << p->data[i];
   } 
@@ -85,7 +88,7 @@ int BplusTree::split_child(node *x, int i)
     np1 = init();
     np1->leaf = false;
     x->leaf = true;
-    for (j = 3; j < 5; j++)
+    for (j = 3; j < degree; j++)
     {
         np3->data[j - 3] = x->data[j];
         np3->child_ptr[j - 3] = x->child_ptr[j];
@@ -93,7 +96,7 @@ int BplusTree::split_child(node *x, int i)
         x->data[j] = 0;
         x->n--;
     }
-    for(j = 0; j < 6; j++)
+    for(j = 0; j < degree+1; j++)
     {
         x->child_ptr[j] = NULL;
     }
@@ -109,7 +112,7 @@ int BplusTree::split_child(node *x, int i)
     mid = y->data[2];
     y->data[2] = 0;
     y->n--;
-    for (j = 3; j < 5; j++)
+    for (j = 3; j < degree; j++)
     {
       np3->data[j - 3] = y->data[j];
       np3->n++;
@@ -124,58 +127,78 @@ int BplusTree::split_child(node *x, int i)
 
 void BplusTree::insert(int a)
 {
+	cout<<"value to add: "<<a<<endl;
   int i, temp;
   x = root;
-  if (x == NULL)
+  if (x == NULL) // if root is null,
   {
     root = init();
     x = root;
+    cout<<"root added!\n"; 
   }
-  else
+  else // root is not null
   {
-    if (x->leaf == true && x->n == 5)
+    if (x->leaf == true && x->n == degree) // se é folha e não tem mais espaços vazios
     {
-      temp = split_child(x, -1);
-      x = root;
-      for (i = 0; i < (x->n); i++)
+    cout<<"é folha e não tem mais espaços vazios\n";
+      temp = split_child(x, -1); // split nesse nó, temp é um int
+      cout<<"temp1: "<<temp<<endl;
+      x = root; // x continua sendo o root
+			cout<<"espaços preenchidos nesse nó: "<<x->n<<endl;
+      for (i = 0; i < (x->n); i++) // for pelos espaços preenchidos desse nó 
       {
+      	// se o valor a ser adicionado é maior do que a posição atual
+      	// e menor do que a próxima, incrementa i
         if ((a > x->data[i]) && (a < x->data[i + 1]))
         {
+        		cout<<"enter 2 if\n";
             i++;
             break;
         }
+        // se o valor a ser adicionado for menor que o primeiro elemento do nó, 
+        // break e pego o i
         else if (a < x->data[0])
-        { break; }
+        { cout<<"enter 3 if\n"; break; }
         else
-        { continue; }
+        { cout<<"enter 4 if\n"; continue; }
       }
-      x = x->child_ptr[i];
+      x = x->child_ptr[i]; // desço para o filho com valor i
+    	cout<<"i: "<<i<<endl;
     }
-    else
+    else // se não é folha ou tem espaços vazios no nó
     {
-      while (x->leaf == false)
+    	cout<<"se não é folha ou tem espaços vazios no nó\n";
+      while (x->leaf == false) // enquanto esse nó não for folha, 
       {
-      for (i = 0; i < (x->n); i++)
-      {
+      for (i = 0; i < (x->n); i++) // for pelos espaços preenchidos desse nó
+      {	
+      	// se o valor a ser adicionado é maior do que a posição atual
+      	// e menor do que a próxima, incrementa i
         if ((a > x->data[i]) && (a < x->data[i + 1]))
         {
+        	cout<<"enter 5 if\n";
           i++;
           break;
         }
+        // se o valor a ser adicionado for menor que o primeiro elemento do nó, 
+        // break e pego o i
         else if (a < x->data[0])
-        { break; }
+        { cout<<"enter 6 if\n"; break; }
         else
-        { continue; }
+        { cout<<"enter 7 if\n"; continue; }
       }
-        if ((x->child_ptr[i])->n == 5)
+      	// se o filho desse nó não tiver mais espaços vazios
+        if ((x->child_ptr[i])->n == degree)
         {
           temp = split_child(x, i);
+         	cout<<"temp2: "<<temp<<endl;
           x->data[x->n] = temp;
           x->n++;
           continue;
         }
         else
         {
+        	cout<<"enter 8 if\n";
           x = x->child_ptr[i];
         }
       }
@@ -183,5 +206,6 @@ void BplusTree::insert(int a)
   }
   x->data[x->n] = a;
   sort(x->data, x->n);
-  x->n++;
+  x->n++; // incrementa o contador mostrando que um dos espaços do nó foi preenchido
+  cout<<"espaços preenchidos nesse nó: "<<x->n<<endl;
 }
