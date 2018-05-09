@@ -1,4 +1,3 @@
-
 /* SOURCE: https://javacc.org/javaccgrm */
 
 
@@ -55,6 +54,9 @@ options {
 
 
 PARSER_BEGIN(Compiler)
+
+import syntaxtree.*;
+
 	public class Compiler {
 		public static void main(String args[]) throws ParseException, java.io.IOException {
 			Compiler compiler;
@@ -137,15 +139,13 @@ TOKEN :  {
 		<OPERATOR: "&&"|"<"|"+"|"-"|"*">
 	| <MODULUS : "%" >
 	| <EQUALS : "=" >
-	
-	/*
 	| <NOTEQUALS : "!=" >
-	| <LESS : "<" >
-	| <GREATER : ">" >
 	| <LESSEQUAL : "<=" >
 	| <GREATEREQUAL : ">=" >
-	| <OPENBRACKET : "(" >
-	| <CLOSEBRACKET : ")" >
+	| <LPAREN: "(" >
+	| <RPAREN: ")" >
+	| <OPENBRACKET : "[" >
+	| <CLOSEBRACKET : "]" >
 	| <OPENCURLY : "{" >
 	| <CLOSECURLY : "}" >
 	| <COMMA : "," >
@@ -155,7 +155,6 @@ TOKEN :  {
 	| <ASSIGNMENT : ":=" >
 	| <QUESTIONMARK : "?" >
 	| <EXCLAMATION : "!" >
-	*/
 }
 
 /* >>>>>>>>>>>>>>>>>>> REGRAS DE PRODUÇÃO <<<<<<<<<<<<<<<<<<< */
@@ -201,6 +200,10 @@ void Statement(): {} {
 | (Id() ["[" Expression() "]"] "=" Expression() ";")
 }
 
+void StatementList(): {} {
+	Statement() (Statement())*
+}
+
 void VarDeclaration(): {} {
   Type() Id() ";"  
 }
@@ -239,6 +242,8 @@ void ClassDeclaration(): {} {
   "}"
 }
 
+void ClassDeclList() : {} { ( ClassDeclaration() )* }
+
 void MethodDeclaration(): {} {
   <PUBLIC> Type() Id() "(" [Type() Id() ("," Type() Id())*] ")"
   "{"
@@ -247,3 +252,32 @@ void MethodDeclaration(): {} {
     <RETURN> Expression() ";"
   "}"
 }
+
+
+/* >>>>>>>>>>>>>>>>>>>  REGRAS DE PRODUÇÃO PARA OS NÓS DA ÁRVORE <<<<<<<<<<<<<<<<<<< */
+
+void Block() : {} { <OPENCURLY> [StatementList()] <CLOSECURLY> }
+void If() : {} { <IF> <LPAREN> Exp() <RPAREN> Statement() <ELSE> Statement() }
+void Print() : {} { <PRINT> <LPAREN> Exp() <RPAREN> <SEMIC> }
+void While() : {} { <WHILE> <LPAREN> Exp() <RPAREN> Statement() }
+void Assign() : {} { Id() <ASSIGN> Expression() <SEMIC> }
+
+ Type Type() : 
+ 	{ Type t; } 
+ 		{ (t=BooleanType() | t=IdentifierType() | t=IntOrIntArrayType() /*LOOKAHEAD(2) t=IntArrayType() | t=IntegerType()*/) { return t; } 
+ 	}
+ Type BooleanType() : 
+ 	{} 
+		{ <BOOLEAN> { return new BooleanType(getPosition()); } 
+	}
+	
+ // ambiguidade? 
+ Type IdentifierType() : 
+ 	{ Identifier i; } 
+		{ i=Identifier() { return new IdentifierType(i.s, getPosition()); }
+	}
+
+ Identifier Identifier() : 
+ 	{ Token t; } 
+ 		{ t=<ID> { return new Identifier(t.image, getPosition()); } 
+ 	}
