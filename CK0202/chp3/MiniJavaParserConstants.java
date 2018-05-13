@@ -117,7 +117,7 @@ public interface MiniJavaParserConstants {
     "\"<\"",
     "\"+\"",
     "\"-\"",
-    "\"&\"",
+    "\"&&\"",
     "\"!\"",
     "\"boolean\"",
     "\"class\"",
@@ -144,7 +144,6 @@ public interface MiniJavaParserConstants {
     "<LETTER>",
     "<DIGIT>",
     "\",\"",
-    "\"&&\"",
     "\"*\"",
   };
 
