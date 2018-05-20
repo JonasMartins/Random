@@ -1,0 +1,6 @@
+enable syntax
+
+
+colorscheme: desert
+
+set backspace=indent,eol,start
