@@ -1,0 +1,25 @@
+syntax enable
+
+colorscheme delek
+" change leader from backslash to comma"
+let mapleader = ','
+
+
+"-------- Mapings -------"
+"imap map for insert mode"
+"vmap map for visual mode"
+"nmap map for normal mode"
+
+"close my current tab"
+nmap <Leader>w :tabc<cr>
+
+
+
+
+"edit my vimrc in another tab <cr> = hit return"
+nmap <Leader>ev :tabedit ~/.vimrc<cr> 
+
+"--------Auto-commands -------"
+
+"Automatically source vimrc file on save"
+autocmd BufWritePost .vimrc source %
