@@ -1,0 +1,117 @@
+set nocompatible
+
+so ~/.vim/plugins.vim
+
+
+syntax enable
+set background=dark
+colorscheme gruvbox
+
+
+" change leader from backslash to comma"
+set backspace=indent,eol,start
+let mapleader = ','
+set number
+
+set tabstop=2
+set shiftwidth=2
+
+
+" * Navigation "
+" gg go to top of document "
+" G to go to end of file "
+" e to jump between words "
+" $ to go to last character "
+" 0 to go to first character " 
+" zz on current line and it will show in the middle of screen, just more visibility "
+
+" :vs - Vertical Split "
+" :sp - Horizontal Split " 
+
+
+
+" * controls "
+" u for undo last modification "
+" U for undo all modifications before last save "
+
+
+" *  searching in vim "
+" To search some word you just press / and type your word enter, " 
+" n to go to next ocurrence N to previous occurence "
+" ggn to first match, Gn to last match "
+" highlighting search matches "
+set hlsearch
+
+" incremental search "
+set incsearch
+
+
+
+" * copy lines "
+" To copy one line just type y and to paste p on normal mode "
+" In visual mode is also possible, V also copy a entire line "
+" . just repeat last command " 
+
+
+"-------- Mapings -------"
+"imap map for insert mode"
+"vmap map for visual mode"
+"nmap map for normal mode"
+
+"close my current tab"
+nmap <Leader>w :tabc<cr>
+
+" turn off highlight after use it "
+nmap <Leader><space> :nohlsearch<cr>
+
+
+"edit my vimrc in another tab <cr> = hit return"
+nmap <Leader>ev :tabedit ~/.vimrc<cr> 
+
+
+"-------- Visual -------"
+
+set t_CO=256
+
+" Remove left, right bars even if the text goes down sight "
+set guioptions-=l
+set guioptions-=L
+set guioptions-=r
+set guioptions-=R
+
+
+"-------- Split Management -------"
+" ctrl+j tp go to lower panel "
+nmap <C-J> <C-W><C-J> 
+
+
+" ctrl+j tp go to above panel "
+nmap <C-K> <C-W><C-K> 
+
+
+" ctrl+h tp go to left panel "
+nmap <C-H> <C-W><C-H> 
+
+
+" ctrl+l tp go to right panel "
+nmap <C-L> <C-W><C-L> 
+
+
+set splitbelow
+set splitright
+
+"----- Make Nerdtree easer to toggle ----- "
+nmap <Leader>1 :NERDTreeToggle<cr>
+
+
+
+
+"--------Auto-commands -------"
+
+"Automatically source vimrc file on save"
+
+" Avoiding duplicate saving when type :w, super speed "
+augroup autosourcing
+	autocmd!
+	autocmd BufWritePost .vimrc source %
+augroup END 
