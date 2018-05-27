@@ -88,3 +88,5 @@ wintypes:
   tooltip = { fade = true; shadow = true; opacity = 0.75; focus = true; };
 };
 
+
+
