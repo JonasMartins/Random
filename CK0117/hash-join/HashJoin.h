@@ -7,10 +7,10 @@ class HashJoin
 {
 
 	public:
-
+		string getBinaryStringNumber(int);
 
 	private:
-
+		string numberToBinaryInvert(int);
 
 };
 

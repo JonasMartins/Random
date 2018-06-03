@@ -12,27 +12,30 @@ using namespace std;
 // g++ HashJoin.cpp -o HashJoin Main.cpp -o Main.exe
 
 
+// chasing
+// chasing
+
 int main(int argc, char **argv)
 {
-	
+	/*
 
-	fpos_t pos; // character position into file
-	int c;
-	int a;
-	const char * dd;
-	string s;
-	char b;
-	int i=0;
-	int j=1;
-	FILE * arq;
-	char line[50];
-	char buffer[] = {'0'};
+	//int c;
+//	int a;
+//	const char * dd;
+//	string s;
+//	char b;
+//	int i=0;
+//	int j=1;
+//	FILE * arq;
+//	char line[50];
+//	char buffer[] = {'0'};
 
 	arq = fopen("orders.txt","r+");
 	if( arq == NULL) perror("Error");
 	else {
 
-			// srand(time(NULL));
+
+		// srand(time(NULL));
 		c = fgetc(arq);
 		while(c != EOF){
 
@@ -51,7 +54,7 @@ int main(int argc, char **argv)
 			//if ((char)c == '\n')
 			//	cout << "A\n"; 
 		
-		
+			
 			
 			//i++;
 			if((char)c == '_'){
@@ -84,5 +87,17 @@ int main(int argc, char **argv)
 	//dd = str.c_str();
 	//cout << dd  << endl;
 	//
+	*/
+	
+
+	HashJoin hash;
+	cout<<hash.getBinaryStringNumber(423)<<endl;
+
+
+
+
+
+
+
 	return EXIT_SUCCESS;
 }
