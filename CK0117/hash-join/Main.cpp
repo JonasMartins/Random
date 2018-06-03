@@ -3,6 +3,7 @@
 #include<stdio.h>
 #include<ctime>
 #include<string>
+#include<map>
 #include"./HashJoin.h"
 
 
@@ -91,12 +92,8 @@ int main(int argc, char **argv)
 	
 
 	HashJoin hash;
-	cout<<hash.getBinaryStringNumber(423)<<endl;
-
-
-
-
-
+	//cout<<hash.getBinaryStringNumber(423)<<endl;
+	cout << hash.getBucketIndex("0100") << endl;
 
 
 	return EXIT_SUCCESS;
