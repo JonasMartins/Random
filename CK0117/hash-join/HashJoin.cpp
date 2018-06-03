@@ -46,5 +46,18 @@ string HashJoin::getBinaryStringNumber(int value)
 	return reverse;
 }
 
+// Gerar todos os buckets, com 4 níveis de números
+// e já preencher a partir dos ids da tabela costumers
+// esse buckets, cada bucket vai conter a tupla
+// que é uma string do arquivo, com seu id correspondente
+void HashJoin::generateAndFillBuckets()
+{
+
+}
+
+
+
+
+
 
 

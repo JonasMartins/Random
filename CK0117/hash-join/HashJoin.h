@@ -11,6 +11,6 @@ class HashJoin
 
 	private:
 		string numberToBinaryInvert(int);
-
+		void generateAndFillBuckets();
 };
 
