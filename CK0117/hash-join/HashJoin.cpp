@@ -8,9 +8,18 @@
 
 using namespace std;
 
-HashJoin::HashJoin()
+HashJoin::HashJoin(string tuple)
 {
 	generateAndFillBuckets();
+	string key = getCostumersKey(tuple);
+	string bin = getBinaryStringNumber(stoi(key));
+  string pattern = getPattern(bin);	
+	unsigned index = getBucketIndex(pattern);
+	cout << bin << endl;
+	cout << pattern << endl;
+	cout << "Bucket: " << index << endl;
+	addToBuckets(index,tuple);
+	showBucketContent(index);
 }
 
 
@@ -57,8 +66,6 @@ string HashJoin::adjustBits(string number)
 		number.insert(0,"0");
 	}
 
-	generateAndFillBuckets();
-
 	return number;
 }
 
@@ -70,6 +77,7 @@ string HashJoin::adjustBits(string number)
 void HashJoin::generateAndFillBuckets()
 {
 	initializeBuckets();
+
 }
 
 // inicializando o reconhecimento de bits
@@ -116,6 +124,37 @@ bool HashJoin::addToBuckets(unsigned bucket,string number)
 	return flag;
 }
 
+
+// Pegando a chave de uma tupla
+// da tabela costumers 
+string HashJoin::getCostumersKey(string tuple)
+{
+	
+	size_t pos = tuple.find(";");
+	string key = tuple.substr(0,pos);
+	// key é exatamente o id de costumer
+	// que vai servir para armazenar a tupla 
+	// no seu bucket correspondente;
+	return key;
+}
+
+// pegando os últimos 4 bits da representação
+// em binario da chave de junção de uma tabela
+string HashJoin::getPattern(string key)
+{
+	return key.substr(12,15);
+}
+
+void HashJoin::showBucketContent(int index)
+{
+	cout << "Conteúdo do bucket "<<index<<":"<<endl; 
+	unsigned i = 0;
+	while(buckets[index][i].compare("") != 0 )
+	{
+		cout << buckets[index][i] << endl;
+		i++;
+	}
+}
 
 
 

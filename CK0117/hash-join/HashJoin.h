@@ -9,7 +9,7 @@ class HashJoin
 
 	public:
 
-		HashJoin();
+		HashJoin(string);
 		string getBinaryStringNumber(int);
 		
 		unsigned getBucketIndex(string);
@@ -17,13 +17,17 @@ class HashJoin
 	private:
 		string numberToBinaryInvert(int);
 		string adjustBits(string);
-		
+		string getCostumersKey(string);
 		string buckets[16][50];
-	  map<string,unsigned> bucketsIndex;
+		string getPattern(string);
+	  
+		
+		map<string,unsigned> bucketsIndex;
 	
 		
 		bool addToBuckets(unsigned,string);
 		void initializeBuckets();
 		void generateAndFillBuckets();
+		void showBucketContent(int);
 };
 

@@ -90,11 +90,13 @@ int main(int argc, char **argv)
 	//
 	*/
 	
+	string a = "119;Costumer_name;Costumer_address;85-9-6666-6666;1000,00_R$";
 
-	HashJoin hash;
+
+	HashJoin hash(a);
 	//cout<<hash.getBinaryStringNumber(423)<<endl;
-	cout << hash.getBucketIndex("0100") << endl;
-
+	
+	//cout << hash.getBucketIndex("0100") << endl;
 
 	return EXIT_SUCCESS;
 }
