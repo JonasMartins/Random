@@ -59,10 +59,10 @@ string HashJoin::getBinaryStringNumber(int value)
 	return adjustBits(reverse);
 }
 
-// Ajusta o tamanho da string para ter 16 bits de comprimento 
+// Ajusta o tamanho da string para ter 32  bits de comprimento 
 string HashJoin::adjustBits(string number)
 {
-	while(number.length()<16){
+	while(number.length()<32){
 		number.insert(0,"0");
 	}
 
@@ -111,14 +111,14 @@ unsigned HashJoin::getBucketIndex(string bucket)
 bool HashJoin::addToBuckets(unsigned bucket,string number)
 {
 	bool flag = false;
-	for(unsigned i=0;i<50;i++)
+	for(unsigned i=0;i<100;i++)
 	{
 		if(buckets[bucket][i].compare("") == 0)
 		{
 			buckets[bucket][i] = number;
 			flag = true;
 			cout <<"Added!" << endl;		
-			i = 50;
+			i = 100;
 		}
 	}
 	return flag;
@@ -142,7 +142,7 @@ string HashJoin::getCostumersKey(string tuple)
 // em binario da chave de junção de uma tabela
 string HashJoin::getPattern(string key)
 {
-	return key.substr(12,15);
+	return key.substr(28,31);
 }
 
 void HashJoin::showBucketContent(int index)

@@ -30,70 +30,50 @@ int main(int argc, char **argv)
 //	FILE * arq;
 //	char line[50];
 //	char buffer[] = {'0'};
+*/
 
-	arq = fopen("orders.txt","r+");
-	if( arq == NULL) perror("Error");
-	else {
+	// esquema para ler linha por linha via fread
 
-
-		// srand(time(NULL));
-		c = fgetc(arq);
-		while(c != EOF){
-
-			// //c = rand()%400 +1;
-			// //cout << c << endl;
-			
-			
-			//if(fgets(c,1,arq) != NULL){
-				//cout << c;
-			//}
-			//c = fgetc(arq);
-			//b = c;
-			//cout << b;
-			//fseek(arq,i,SEEK_SET);
-			//c = fgetc(arq);
-			//if ((char)c == '\n')
-			//	cout << "A\n"; 
-		
-			
-			
-			//i++;
-			if((char)c == '_'){
-				//j++; // line number, same as tuple id
-				//fseek(arq,i+1,SEEK_SET);
-				//a = rand()%550+1;// random number from 1 to 400
-				//a = "";
-				//a = j;
-				//s = to_string(a);// convert the a number to string
-				//printf("C: %c\n", (char)c);				
-				//c = 0;
-				
-				//dd = s.c_str();// convert the string number a to const char *
-				//cout << dd;
-				//fputs(dd,arq);
-				//
-				//fwrite(buffer,sizeof(char),1,arq);
-				fprintf(arq,buffer,1);
-				//printf("%s\n", "kkkk");
-			}
-			//j++;
-			c = fgetc(arq);
-		}	
-		
-	}	
-	fclose(arq);
-	//const char * dd;
-	//string str;
-	//str = to_string(340);
-	//dd = str.c_str();
-	//cout << dd  << endl;
-	//
-	*/
+	FILE * arq;
+	arq = fopen("lineitem.txt","r+");
+	//long lSize;
+	fpos_t pos;
+	char * buffer;
+	size_t result;
+	//fseek (arq, 0 , SEEK_END);
+	//lSize = ftell (arq);
+	//rewind (arq);
+	//cout << sizeof(char)*lSize << endl;
+	// buffer tem o tamanho de todo o arquivo em memória
+	//buffer = (char*) malloc (sizeof(char)*lSize);
+	//if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+	//cout << sizeof(buffer) << endl;
+	fgetpos(arq,&pos);
+	buffer  = (char*)malloc(sizeof(char)*256);
 	
-	string a = "119;Costumer_name;Costumer_address;85-9-6666-6666;1000,00_R$";
+	// lembrando que result é o número de 
+	// carabteres lidos bem sucedidos pelo fread
+	fread(buffer,1,256,arq);
+	cout << buffer << endl;
 
+	char * clean;
+	unsigned j=0;
+	for(unsigned i=150;i<256;i++)
+	{
+		if(buffer[i] == '\n'){
+			j=i;
+			i=256;
+		}
+	}
+	cout << j << endl;
+	clean  = (char*)malloc(sizeof(char)*j);
+	fsetpos(arq,&pos);
+	fread(clean,1,j,arq);
+	cout << clean << endl;
+	free(clean);
+	free(buffer);
 
-	HashJoin hash(a);
+	//HashJoin hash(a);
 	//cout<<hash.getBinaryStringNumber(423)<<endl;
 	
 	//cout << hash.getBucketIndex("0100") << endl;

@@ -18,7 +18,7 @@ class HashJoin
 		string numberToBinaryInvert(int);
 		string adjustBits(string);
 		string getCostumersKey(string);
-		string buckets[16][50];
+		string buckets[16][100];
 		string getPattern(string);
 	  
 		
