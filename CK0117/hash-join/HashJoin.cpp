@@ -101,6 +101,31 @@ void HashJoin::readCleanFileLine(char * file)
 
 }
 
+// retorna o número da coluna, sa não achar, retorna 99
+unsigned HashJoin::getKeyColumn(char *a,string match)
+{
+	unsigned i,j,k,l;
+	i=j=k=0;
+	l=99;
+	string buffer = "";
+	string aa;
+	aa.assign(a);
+	while(j<aa.length()){
+		if(aa[j] == ','){
+			l=i;
+			i++;
+			if(match.compare(aa.substr(k,(j-k))) == 0){				
+				j=aa.length();
+			}else {
+				k=j+1;
+			}
+		}
+		j++;			
+	}
+	cout<<l<<endl;
+	return l;
+}
+
 
 // pega a string representando o binário do número
 // invertida e revert retornando a string correta
@@ -123,7 +148,6 @@ string HashJoin::adjustBits(string number)
 	while(number.length()<32){
 		number.insert(0,"0");
 	}
-
 	return number;
 }
 

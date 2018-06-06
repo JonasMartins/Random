@@ -12,6 +12,7 @@ class HashJoin
 		HashJoin(int, char **);
 		string getBinaryStringNumber(int);
 		
+		unsigned getKeyColumn(char *,string);
 		unsigned getBucketIndex(string);
 	
 	private:
@@ -20,7 +21,7 @@ class HashJoin
 		string getCostumersKey(string);
 		string buckets[16][100];
 		string getPattern(string);
-	  
+
 		
 		map<string,unsigned> bucketsIndex;
 	

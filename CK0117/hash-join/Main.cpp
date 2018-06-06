@@ -78,6 +78,9 @@ int main(int argc, char **argv)
 	// free(buffer);
 	
 	HashJoin hash(argc,argv);
+	string match = "l_suppkey";
+	char * a = (char*)"l_orderkey,l_partkey,l_suppkey,l_linenumber,l_quantity,l_extendedprice,l_discount,l_tax,l_returnflag,l_linestatus,l_shipDATE,l_commitDATE,l_receiptDATE,l_shipinstruct,l_shipmode,l_comment";
+	hash.getKeyColumn(a,match);
 	//cout<<hash.getBinaryStringNumber(423)<<endl;
 	
 	//cout << hash.getBucketIndex("0100") << endl;
