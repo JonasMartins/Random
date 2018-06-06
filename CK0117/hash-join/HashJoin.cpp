@@ -8,18 +8,68 @@
 
 using namespace std;
 
-HashJoin::HashJoin(string tuple)
+HashJoin::HashJoin(int argc, char **argv)
 {
-	generateAndFillBuckets();
-	string key = getCostumersKey(tuple);
-	string bin = getBinaryStringNumber(stoi(key));
-  string pattern = getPattern(bin);	
-	unsigned index = getBucketIndex(pattern);
-	cout << bin << endl;
-	cout << pattern << endl;
-	cout << "Bucket: " << index << endl;
-	addToBuckets(index,tuple);
-	showBucketContent(index);
+	
+	exceptionInputs(argc,argv);
+
+	// generateAndFillBuckets();
+	// string key = getCostumersKey(tuple);
+	// string bin = getBinaryStringNumber(stoi(key));
+ //  	string pattern = getPattern(bin);	
+	// unsigned index = getBucketIndex(pattern);
+	// cout << bin << endl;
+	// cout << pattern << endl;
+	// cout << "Bucket: " << index << endl;
+	// addToBuckets(index,tuple);
+	// showBucketContent(index);
+}
+
+// lendo os arquivos passados pela execoção
+bool HashJoin::readTables(char ** argv)
+{
+	FILE * table1;
+	FILE * table2;
+	bool flag = true;
+	table1 = fopen(argv[1],"r+");
+	table2 = fopen(argv[3],"r+");
+	if (table1 == NULL || table2 == NULL){
+		flag = false;
+		fclose(table1);
+		fclose(table2);
+	}
+	return flag;
+}
+
+// lendo os nomes dos campos junção passados pela execução
+bool HashJoin::readKeys(char ** argv)
+{
+	char * key1;
+	char * key2;
+	bool flag = true;
+	key1 = argv[2];
+	key2 = argv[4];
+	if (key1 == NULL || key2 == NULL)
+		flag = false;
+	return flag;
+}
+
+// analisa a validade dos inputs passados na execução
+void HashJoin::exceptionInputs(int argc, char **argv)
+{
+	if((argc < 5)){
+		cout<<"Quantidade de parametros incorreta: "<<endl;
+		cout<<"tabela1.txt key1 tabela2.txt key2"<<endl;
+		exit(1);	
+	}
+
+	if((!readTables(argv)) || (!readKeys(argv)))
+	{
+		cout<<"Erro nos arquivos ou strings passadas, tabelas ou chaves de junção"<<endl;
+		exit(1);
+	} else {
+		cout << "Files readed corretly." << endl;
+	}
 }
 
 
@@ -42,12 +92,20 @@ string  HashJoin::numberToBinaryInvert(int number)
 	return v;
 }
 
+// pegando uma tabela dada por um arquivo e lendo
+// e retornando, essa função é chamada dentro 
+// de um for e a sua funcionalidade depende do set
+// e get position do arquivo para ler corretamente.
+void HashJoin::readCleanFileLine(char * file)
+{
+
+}
+
 
 // pega a string representando o binário do número
 // invertida e revert retornando a string correta
 string HashJoin::getBinaryStringNumber(int value)
 {
-	
 	string number = numberToBinaryInvert(value);
 	string reverse = "";
 	unsigned i; 

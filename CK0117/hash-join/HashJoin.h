@@ -9,7 +9,7 @@ class HashJoin
 
 	public:
 
-		HashJoin(string);
+		HashJoin(int, char **);
 		string getBinaryStringNumber(int);
 		
 		unsigned getBucketIndex(string);
@@ -24,10 +24,16 @@ class HashJoin
 		
 		map<string,unsigned> bucketsIndex;
 	
-		
+		void readCleanFileLine(char *);
+
+		bool readKeys(char **);
+		bool readTables(char **);
 		bool addToBuckets(unsigned,string);
+
+		void exceptionInputs(int, char **);
 		void initializeBuckets();
 		void generateAndFillBuckets();
 		void showBucketContent(int);
+
 };
 
