@@ -14,6 +14,9 @@ class HashJoin
 		
 		unsigned getKeyColumn(char *,string);
 		unsigned getBucketIndex(string);
+		
+		char * getTable1Name();
+		char * getTable2Name();
 	
 	private:
 		string numberToBinaryInvert(int);
@@ -23,9 +26,16 @@ class HashJoin
 		string getPattern(string);
 
 		
+		
+		char * getCleanLine();
+
+
 		map<string,unsigned> bucketsIndex;
 	
+
+		void setTableNames(char **);
 		void readCleanFileLine(char *);
+
 
 		bool readKeys(char **);
 		bool readTables(char **);
@@ -36,5 +46,12 @@ class HashJoin
 		void generateAndFillBuckets();
 		void showBucketContent(int);
 
+		char * key1;
+		char * key2;
+		char * table1Name;
+		char * table2Name;
+
+		FILE * table1;
+		FILE * table2;
 };
 

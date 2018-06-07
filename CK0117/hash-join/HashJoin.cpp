@@ -4,14 +4,18 @@
 #include<math.h>
 #include<sstream>
 #include<string>
+#include<ctime>
 #include"./HashJoin.h"
 
 using namespace std;
 
-HashJoin::HashJoin(int argc, char **argv)
+HashJoin::HashJoin(int argc, char ** argv)
 {
-	
+	// salvando o nome das tabelas passadas
+	setTableNames(argv);
+
 	exceptionInputs(argc,argv);
+	getCleanLine();
 
 	// generateAndFillBuckets();
 	// string key = getCostumersKey(tuple);
@@ -25,14 +29,17 @@ HashJoin::HashJoin(int argc, char **argv)
 	// showBucketContent(index);
 }
 
+void HashJoin::setTableNames(char ** argv)
+{
+	table1Name = argv[1];
+	table2Name = argv[3];
+}
 // lendo os arquivos passados pela execoção
 bool HashJoin::readTables(char ** argv)
 {
-	FILE * table1;
-	FILE * table2;
 	bool flag = true;
-	table1 = fopen(argv[1],"r+");
-	table2 = fopen(argv[3],"r+");
+	table1 = fopen(argv[1],"rb+");
+	table2 = fopen(argv[3],"rb+");
 	if (table1 == NULL || table2 == NULL){
 		flag = false;
 		fclose(table1);
@@ -44,8 +51,6 @@ bool HashJoin::readTables(char ** argv)
 // lendo os nomes dos campos junção passados pela execução
 bool HashJoin::readKeys(char ** argv)
 {
-	char * key1;
-	char * key2;
 	bool flag = true;
 	key1 = argv[2];
 	key2 = argv[4];
@@ -91,6 +96,63 @@ string  HashJoin::numberToBinaryInvert(int number)
 	}
 	return v;
 }
+
+char * HashJoin::getCleanLine()
+{
+
+	 //FILE * arq;
+	 //arq = fopen("/home/jonas/Documentos/SGBD/Tables/orders.dat","rb+");
+	 //long lSize;
+	 //if(arq==NULL)
+		// exit(1);
+	 
+	table1 = fopen(getTable1Name(),"rb+");
+	
+	 //int start_s=clock();
+
+	fpos_t pos;
+	char * buffer;
+	size_t result;
+	 //fseek (arq, 0 , SEEK_END);
+	 //lSize = ftell (arq);
+	 //rewind (arq);
+	 //cout << sizeof(char)*lSize << endl;
+	 // buffer tem o tamanho de todo o arquivo em memória
+	 //buffer = (char*) malloc (sizeof(char)*lSize);
+	 //if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+	 //cout << sizeof(buffer) << endl;
+	fgetpos(table1,&pos);
+	buffer = (char*)malloc(sizeof(char)*256);
+
+ 	// lembrando que result é o número de 
+ 	// carabteres lidos bem sucedidos pelo fread
+ 	fread(buffer,1,256,table1);
+ 	//cout << buffer << endl;
+
+ 	char * clean;
+ 	unsigned j=0;
+ 	for(unsigned i=50;i<250;i++)
+ 	{
+ 		if(buffer[i] == '\n'){
+ 			j=i;
+ 			i=250;
+ 		}
+ 	}
+ 	//cout << j << endl;
+	clean  = (char*)malloc(sizeof(char)*j);
+	fsetpos(table1,&pos);
+	fread(clean,1,j,table1);
+	cout << clean << endl;
+	free(clean);
+	free(buffer);
+	
+	//int stop_s=clock();
+	//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << endl;
+
+	return clean;
+
+}
+
 
 // pegando uma tabela dada por um arquivo e lendo
 // e retornando, essa função é chamada dentro 
@@ -238,8 +300,14 @@ void HashJoin::showBucketContent(int index)
 	}
 }
 
+char *  HashJoin::getTable1Name()
+{
+	return table1Name; 
+}
 
-
-
+char *  HashJoin::getTable2Name()
+{
+	return table2Name; 
+}
 
 
