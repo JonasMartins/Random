@@ -5,16 +5,19 @@
 #include<sstream>
 #include<string>
 #include<ctime>
+#include<sys/types.h>
+#include<sys/stat.h>
+#include<unistd.h>
 #include"./HashJoin.h"
 
 using namespace std;
 
 HashJoin::HashJoin(int argc, char ** argv)
 {
+	exceptionInputs(argc,argv);
+	
 	// salvando o nome das tabelas passadas
 	setTableNames(argv);
-
-	exceptionInputs(argc,argv);
 	getCleanLine();
 
 	// generateAndFillBuckets();
@@ -28,11 +31,29 @@ HashJoin::HashJoin(int argc, char ** argv)
 	// addToBuckets(index,tuple);
 	// showBucketContent(index);
 }
-
+// Setando os nomes e os atributos de junção nas
+// variáveis, sempre colocando o menor arquivo na
+// tabela1 para ser armazenada em memória
 void HashJoin::setTableNames(char ** argv)
 {
-	table1Name = argv[1];
-	table2Name = argv[3];
+	struct stat filestatus;
+	stat(argv[1],&filestatus);
+	long size1 = filestatus.st_size;
+	stat(argv[3],&filestatus);
+	long size2 = filestatus.st_size;
+	
+	if(size1<=size2){
+		table1Name = argv[1];
+		table2Name = argv[3];
+		key1 = argv[2];
+		key2 = argv[4];
+	}	else {
+		table1Name = argv[3];
+		table2Name = argv[1];
+		key1 = argv[4];
+		key2 = argv[2];
+	}
+
 }
 // lendo os arquivos passados pela execoção
 bool HashJoin::readTables(char ** argv)
@@ -108,8 +129,8 @@ char * HashJoin::getCleanLine()
 	 
 	table1 = fopen(getTable1Name(),"rb+");
 	
-	 //int start_s=clock();
 
+	 //int start_s=clock();
 	fpos_t pos;
 	char * buffer;
 	size_t result;
@@ -122,16 +143,49 @@ char * HashJoin::getCleanLine()
 	 //if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
 	 //cout << sizeof(buffer) << endl;
 	fgetpos(table1,&pos);
+	//cout<<"pos: "<<&pos<<endl;
 	buffer = (char*)malloc(sizeof(char)*256);
 
  	// lembrando que result é o número de 
  	// carabteres lidos bem sucedidos pelo fread
  	fread(buffer,1,256,table1);
- 	//cout << buffer << endl;
+ 	//cout << "buffer: \n"<<buffer << endl;
 
  	char * clean;
  	unsigned j=0;
- 	for(unsigned i=50;i<250;i++)
+	unsigned i;
+	// pegando a primeira linha quebrada dos arquivos
+	// que retorna ECHO est ativado
+	// essa linha qubra toda a lógica do arquivo
+	// por isso vamos pular essa linha
+	// e o loop de toda leitura da tabela vai ter que ficar nessa tupla.
+	for(i=0;i<250;i++)
+	{
+		if(buffer[i]=='\n'){
+			j=i;
+			i=256;
+		}
+	}
+ 	//cout << j << endl;
+	clean  = (char*)malloc(sizeof(char)*j);
+	fsetpos(table1,&pos);
+	fread(clean,1,j,table1);
+	fgetpos(table1,&pos);
+	//cout<<"pos: "<<&pos<<endl;
+	//cout<<"clean:\n"<<clean<<endl;
+	free(buffer);
+	free(clean);
+	// =================================== PULANDO PRIMEIRA LINHA QUEBRADA
+	
+
+	buffer = (char*)malloc(sizeof(char)*256);
+	fgetpos(table1,&pos);// colocando o ponteiro no inicio da nova linha buffer
+ 	fread(buffer,1,256,table1);
+	
+	// primeiro caractere do buffer é o \n da linha anterior
+ 	//cout << "buffer:"<<buffer << endl;
+ 	
+	for(i=50;i<250;i++)
  	{
  		if(buffer[i] == '\n'){
  			j=i;
@@ -140,14 +194,18 @@ char * HashJoin::getCleanLine()
  	}
  	//cout << j << endl;
 	clean  = (char*)malloc(sizeof(char)*j);
-	fsetpos(table1,&pos);
+	//cout<<"pos: "<<&pos<<endl;
+	clean  = (char*)malloc(sizeof(char)*j);
+	fsetpos(table1,&pos);// setando novamente no final da linha limpa
 	fread(clean,1,j,table1);
-	cout << clean << endl;
-	free(clean);
+	//cout << "clean: "<<clean << endl;
+	//free(clean);
 	free(buffer);
 	
 	//int stop_s=clock();
 	//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << endl;
+	
+	getKeyColumn(clean,getColumn1Name());
 
 	return clean;
 
@@ -166,20 +224,24 @@ void HashJoin::readCleanFileLine(char * file)
 // retorna o número da coluna, sa não achar, retorna 99
 unsigned HashJoin::getKeyColumn(char *a,string match)
 {
+	cout <<"match "<<match << endl;
 	unsigned i,j,k,l;
-	i=j=k=0;
+	i=j=k=1;
 	l=99;
 	string buffer = "";
 	string aa;
 	aa.assign(a);
+	cout << "aa: " <<aa << endl;
 	while(j<aa.length()){
 		if(aa[j] == ','){
 			l=i;
 			i++;
+			//cout<<"cpm: "<<aa.substr(k,(j-k))<<endl;
 			if(match.compare(aa.substr(k,(j-k))) == 0){				
 				j=aa.length();
 			}else {
 				k=j+1;
+				l=99;
 			}
 		}
 		j++;			
@@ -308,6 +370,16 @@ char *  HashJoin::getTable1Name()
 char *  HashJoin::getTable2Name()
 {
 	return table2Name; 
+}
+
+char *  HashJoin::getColumn1Name()
+{
+	return key1; 
+}
+
+char *  HashJoin::getColumn2Name()
+{
+	return key2; 
 }
 
 

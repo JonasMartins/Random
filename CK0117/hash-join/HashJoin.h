@@ -17,6 +17,9 @@ class HashJoin
 		
 		char * getTable1Name();
 		char * getTable2Name();
+		
+		char * getColumn1Name();
+		char * getColumn2Name();
 	
 	private:
 		string numberToBinaryInvert(int);
