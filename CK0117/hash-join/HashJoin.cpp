@@ -18,7 +18,10 @@ HashJoin::HashJoin(int argc, char ** argv)
 	
 	// salvando o nome das tabelas passadas
 	setTableNames(argv);
-	getCleanLine();
+	generateAndFillBuckets();
+	readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
+
+
 
 	// generateAndFillBuckets();
 	// string key = getCostumersKey(tuple);
@@ -31,6 +34,8 @@ HashJoin::HashJoin(int argc, char ** argv)
 	// addToBuckets(index,tuple);
 	// showBucketContent(index);
 }
+
+
 // Setando os nomes e os atributos de junção nas
 // variáveis, sempre colocando o menor arquivo na
 // tabela1 para ser armazenada em memória
@@ -98,9 +103,6 @@ void HashJoin::exceptionInputs(int argc, char **argv)
 	}
 }
 
-
-// cout snippet @c 
-
 // Recebe um numero decimal e retorna a
 // sua representação em binario em uma string 
 // porem está invertida
@@ -118,120 +120,181 @@ string  HashJoin::numberToBinaryInvert(int number)
 	return v;
 }
 
-char * HashJoin::getCleanLine()
+// Dentro dos arquivos gerados existe uma linha escrita ECHO est ativado.
+// essa linha quebra toda a logica de abrir o arquivo e ler a primaira linha
+// que contem o nome das colunas, esse método pula essa linha e retorna
+// a posição do ponteiro no inicio da verdadeira linha que lê o verdadeiro
+// cabeçalho do arquivo.
+fpos_t HashJoin::jumpBrokenLine()
 {
 
-	 //FILE * arq;
-	 //arq = fopen("/home/jonas/Documentos/SGBD/Tables/orders.dat","rb+");
-	 //long lSize;
-	 //if(arq==NULL)
-		// exit(1);
-	 
 	table1 = fopen(getTable1Name(),"rb+");
-	
-
-	 //int start_s=clock();
 	fpos_t pos;
 	char * buffer;
 	size_t result;
-	 //fseek (arq, 0 , SEEK_END);
-	 //lSize = ftell (arq);
-	 //rewind (arq);
-	 //cout << sizeof(char)*lSize << endl;
-	 // buffer tem o tamanho de todo o arquivo em memória
-	 //buffer = (char*) malloc (sizeof(char)*lSize);
-	 //if (buffer == NULL) {fputs ("Memory error",stderr); exit (2);}
-	 //cout << sizeof(buffer) << endl;
 	fgetpos(table1,&pos);
-	//cout<<"pos: "<<&pos<<endl;
 	buffer = (char*)malloc(sizeof(char)*256);
-
- 	// lembrando que result é o número de 
- 	// carabteres lidos bem sucedidos pelo fread
  	fread(buffer,1,256,table1);
  	//cout << "buffer: \n"<<buffer << endl;
-
  	char * clean;
  	unsigned j=0;
 	unsigned i;
-	// pegando a primeira linha quebrada dos arquivos
-	// que retorna ECHO est ativado
-	// essa linha qubra toda a lógica do arquivo
-	// por isso vamos pular essa linha
-	// e o loop de toda leitura da tabela vai ter que ficar nessa tupla.
-	for(i=0;i<250;i++)
-	{
+	for(i=0;i<250;i++){
 		if(buffer[i]=='\n'){
 			j=i;
 			i=256;
 		}
 	}
- 	//cout << j << endl;
 	clean  = (char*)malloc(sizeof(char)*j);
 	fsetpos(table1,&pos);
 	fread(clean,1,j,table1);
 	fgetpos(table1,&pos);
-	//cout<<"pos: "<<&pos<<endl;
 	//cout<<"clean:\n"<<clean<<endl;
 	free(buffer);
 	free(clean);
-	// =================================== PULANDO PRIMEIRA LINHA QUEBRADA
-	
+	fclose(table1);
+	return pos;
+}
 
+
+// Dentro do arquivo binário, após pular a primeira linha que contém
+// uma frase solta que quebraria a implementação do programa, existe uma
+// linha com os nomes das colunas da tabela, nessa função, armazenamos
+// o número dessa coluna, se a mesma for igual ao nome passado por argumento
+// depois de ler a primeira linha, retorna o ponteiro do arquivo para
+// a próxima linha, onde outro método vai ler o restante do arquivo e armazenar
+// as tuplas no seu bucket correspondente.
+fpos_t  HashJoin::getCleanHeader()
+{
+	fpos_t pos = jumpBrokenLine();
+	char * clean;
+	char * buffer;
+ 	unsigned j=0;
+	unsigned i;
+	table1 = fopen(getTable1Name(),"rb+");
 	buffer = (char*)malloc(sizeof(char)*256);
-	fgetpos(table1,&pos);// colocando o ponteiro no inicio da nova linha buffer
+	fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
  	fread(buffer,1,256,table1);
-	
-	// primeiro caractere do buffer é o \n da linha anterior
  	//cout << "buffer:"<<buffer << endl;
- 	
-	for(i=50;i<250;i++)
- 	{
+	for(i=50;i<250;i++){
  		if(buffer[i] == '\n'){
  			j=i;
- 			i=250;
+ 			i=256;
  		}
  	}
- 	//cout << j << endl;
-	clean  = (char*)malloc(sizeof(char)*j);
-	//cout<<"pos: "<<&pos<<endl;
-	clean  = (char*)malloc(sizeof(char)*j);
-	fsetpos(table1,&pos);// setando novamente no final da linha limpa
+	clean = (char*)malloc(sizeof(char)*j);
+	fsetpos(table1,&pos);// setando novamente no inicio  da linha do buffer
 	fread(clean,1,j,table1);
+	fgetpos(table1,&pos);// setando o ponteiro no final da linha de cabeçalho
 	//cout << "clean: "<<clean << endl;
-	//free(clean);
 	free(buffer);
-	
-	//int stop_s=clock();
-	//cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << endl;
-	
-	getKeyColumn(clean,getColumn1Name());
-
-	return clean;
-
+	unsigned index = getKeyColumn(clean,getColumn1Name());
+	if(index == 99){
+		cout << "Coluna de junção não encontrada para essa tabela"<<endl;
+		exit(0);
+	}else {
+	 	key1Position = index; //armazeno o indice da coluna do atributo de junção da tabela 1
+	}
+	fclose(table1);
+	free(clean);
+	return pos;
 }
 
-
-// pegando uma tabela dada por um arquivo e lendo
-// e retornando, essa função é chamada dentro 
-// de um for e a sua funcionalidade depende do set
-// e get position do arquivo para ler corretamente.
-void HashJoin::readCleanFileLine(char * file)
+// Método que vai ler linha por linha da tabela a ser armazenada
+// no seu devido bucket
+void HashJoin::readCleanFileLine()
 {
-
+	int key;
+	string bin,pattern;
+	fpos_t pos = getCleanHeader();
+	char * clean;
+	char * buffer;
+ 	unsigned j=0;
+	unsigned i,k,index;
+	table1 = fopen(getTable1Name(),"rb+");
+	
+	for(unsigned ii=0;ii<7;ii++)
+	{
+		buffer = (char*)malloc(sizeof(char)*256);
+		fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
+	 	fread(buffer,1,256,table1);
+ 		//cout << "buffer:"<<buffer << endl;
+		for(i=50;i<250;i++){
+ 			if(buffer[i] == '\n'){
+ 				j=i;
+ 				i=256;
+ 			}
+ 		}
+		clean = (char*)malloc(sizeof(char)*j);
+		fsetpos(table1,&pos);// setando novamente no inicio  da linha do buffer
+		fread(clean,1,j,table1);
+		fgetpos(table1,&pos);// setando o ponteiro no final da linha de cabeçalho
+		//cout << "clean: "<< clean << endl;
+		k = getJoinColumnPosition(clean,getKey1Position());
+		key = getJoinColumn(clean,k);
+		bin = getBinaryStringNumber(key);
+		pattern = getPattern(bin);
+		index = getBucketIndex(pattern);
+		addToBuckets(index,clean);
+		showBucketContent(index);
+		
+		free(clean);
+		free(buffer);
+	}
+	fclose(table1);
 }
+
+
+// Pegando a posição inicial da  coluna de junção
+// na tupla recem lida da tabela que vai ser armazenada na memória.
+unsigned  HashJoin::getJoinColumnPosition(char * tuple,unsigned col)
+{
+	unsigned pos;
+	size_t found; 
+	size_t sum = 0;
+	string buffer = "";
+ 	string aux = "";
+	buffer.assign(tuple);	
+	for(unsigned i = 1;i<col;i++){
+		found = buffer.find(",");
+		sum+=(found+1);
+		aux = buffer;
+		buffer = aux.erase(0,found+1);
+		//cout <<"buffer: "<<buffer<<endl;
+	}
+	pos = static_cast<unsigned>(sum);
+	return pos;
+}
+
+
+// Recebe a posição inicial da coluna de junção, a tupla 
+// e lê os póximos caracteres até encontrar a virgula
+// pegando exatamente o valor do atributo de junção
+int  HashJoin::getJoinColumn(char * tuple,unsigned pos)
+{
+	int ikey;
+	unsigned i=pos;
+	string key="";
+	while(tuple[i]!=','){
+		key+=tuple[i];
+		i++;
+	}
+	ikey = stoi(key);
+	return ikey;
+}
+
 
 // retorna o número da coluna, sa não achar, retorna 99
 unsigned HashJoin::getKeyColumn(char *a,string match)
 {
-	cout <<"match "<<match << endl;
+	//cout <<"match "<<match << endl;
 	unsigned i,j,k,l;
 	i=j=k=1;
 	l=99;
 	string buffer = "";
 	string aa;
 	aa.assign(a);
-	cout << "aa: " <<aa << endl;
+	//cout << "aa: " <<aa << endl;
 	while(j<aa.length()){
 		if(aa[j] == ','){
 			l=i;
@@ -246,7 +309,7 @@ unsigned HashJoin::getKeyColumn(char *a,string match)
 		}
 		j++;			
 	}
-	cout<<l<<endl;
+	//cout<<l<<endl;
 	return l;
 }
 
@@ -362,6 +425,8 @@ void HashJoin::showBucketContent(int index)
 	}
 }
 
+// ================== GETTERS AND SETTERS
+
 char *  HashJoin::getTable1Name()
 {
 	return table1Name; 
@@ -382,4 +447,13 @@ char *  HashJoin::getColumn2Name()
 	return key2; 
 }
 
+unsigned HashJoin::getKey1Position()
+{
+	return key1Position;
+}
+
+unsigned HashJoin::getKey2Position()
+{
+	return key2Position;
+}	
 

@@ -21,23 +21,28 @@ class HashJoin
 		char * getColumn1Name();
 		char * getColumn2Name();
 	
+		unsigned getKey1Position();
+		unsigned getKey2Position();
+
 	private:
 		string numberToBinaryInvert(int);
 		string adjustBits(string);
 		string getCostumersKey(string);
 		string buckets[16][100];
 		string getPattern(string);
-
+		int  getJoinColumn(char *,unsigned);
 		
 		
-		char * getCleanLine();
+		fpos_t jumpBrokenLine();
+		
+		fpos_t getCleanHeader();
 
 
 		map<string,unsigned> bucketsIndex;
 	
 
 		void setTableNames(char **);
-		void readCleanFileLine(char *);
+		void readCleanFileLine();
 
 
 		bool readKeys(char **);
@@ -49,6 +54,13 @@ class HashJoin
 		void generateAndFillBuckets();
 		void showBucketContent(int);
 
+		unsigned getJoinColumnPosition(char *,unsigned);
+
+
+		// ====================== VARIÁVEIS
+		
+		unsigned key1Position;
+		unsigned key2Position;
 		char * key1;
 		char * key2;
 		char * table1Name;
