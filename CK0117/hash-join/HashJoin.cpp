@@ -213,7 +213,7 @@ void HashJoin::readCleanFileLine()
 	unsigned i,k,index;
 	table1 = fopen(getTable1Name(),"rb+");
 	
-	for(unsigned ii=0;ii<7;ii++)
+	for(unsigned ii=0;ii<100;ii++)
 	{
 		buffer = (char*)malloc(sizeof(char)*256);
 		fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
@@ -232,11 +232,13 @@ void HashJoin::readCleanFileLine()
 		//cout << "clean: "<< clean << endl;
 		k = getJoinColumnPosition(clean,getKey1Position());
 		key = getJoinColumn(clean,k);
-		bin = getBinaryStringNumber(key);
-		pattern = getPattern(bin);
-		index = getBucketIndex(pattern);
-		addToBuckets(index,clean);
-		showBucketContent(index);
+		cout<<key<<endl;
+	
+		//bin = getBinaryStringNumber(key);
+		//pattern = getPattern(bin);
+		//index = getBucketIndex(pattern);
+		//addToBuckets(index,clean);
+		//showBucketContent(index);
 		
 		free(clean);
 		free(buffer);
