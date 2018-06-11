@@ -22,17 +22,18 @@ HashJoin::HashJoin(int argc, char ** argv)
 	readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
 
 
-
-	// generateAndFillBuckets();
-	// string key = getCostumersKey(tuple);
-	// string bin = getBinaryStringNumber(stoi(key));
- //  	string pattern = getPattern(bin);	
-	// unsigned index = getBucketIndex(pattern);
-	// cout << bin << endl;
-	// cout << pattern << endl;
-	// cout << "Bucket: " << index << endl;
-	// addToBuckets(index,tuple);
-	// showBucketContent(index);
+	/*
+	generateAndFillBuckets();
+	string key = getCostumersKey(tuple);
+	string bin = getBinaryStringNumber(stoi(key));
+ 	string pattern = getPattern(bin);	
+  unsigned index = getBucketIndex(pattern);
+	cout << bin << endl;
+	//cout << pattern << endl;
+	//cout << "Bucket: " << index << endl;
+	addToBuckets(index,tuple);
+	showBucketContent(index);
+	*/
 }
 
 
@@ -119,7 +120,7 @@ string  HashJoin::numberToBinaryInvert(int number)
 	}
 	return v;
 }
-
+/*
 // Dentro dos arquivos gerados existe uma linha escrita ECHO est ativado.
 // essa linha quebra toda a logica de abrir o arquivo e ler a primaira linha
 // que contem o nome das colunas, esse método pula essa linha e retorna
@@ -155,7 +156,7 @@ fpos_t HashJoin::jumpBrokenLine()
 	fclose(table1);
 	return pos;
 }
-
+*/
 
 // Dentro do arquivo binário, após pular a primeira linha que contém
 // uma frase solta que quebraria a implementação do programa, existe uma
@@ -166,14 +167,15 @@ fpos_t HashJoin::jumpBrokenLine()
 // as tuplas no seu bucket correspondente.
 fpos_t  HashJoin::getCleanHeader()
 {
-	fpos_t pos = jumpBrokenLine();
+	fpos_t pos;// = jumpBrokenLine();
 	char * clean;
 	char * buffer;
  	unsigned j=0;
 	unsigned i;
 	table1 = fopen(getTable1Name(),"rb+");
+	fgetpos(table1,&pos);
 	buffer = (char*)malloc(sizeof(char)*256);
-	fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
+	//fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
  	fread(buffer,1,256,table1);
  	//cout << "buffer:"<<buffer << endl;
 	for(i=50;i<250;i++){
@@ -213,7 +215,7 @@ void HashJoin::readCleanFileLine()
 	unsigned i,k,index;
 	table1 = fopen(getTable1Name(),"rb+");
 	
-	for(unsigned ii=0;ii<100;ii++)
+	for(unsigned ii=0;ii<20;ii++)
 	{
 		buffer = (char*)malloc(sizeof(char)*256);
 		fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
@@ -233,13 +235,13 @@ void HashJoin::readCleanFileLine()
 		k = getJoinColumnPosition(clean,getKey1Position());
 		key = getJoinColumn(clean,k);
 		cout<<key<<endl;
-	
-		//bin = getBinaryStringNumber(key);
-		//pattern = getPattern(bin);
-		//index = getBucketIndex(pattern);
-		//addToBuckets(index,clean);
-		//showBucketContent(index);
-		
+		/*
+		bin = getBinaryStringNumber(key);
+		pattern = getPattern(bin);
+		index = getBucketIndex(pattern);
+		addToBuckets(index,clean);
+		showBucketContent(index);
+		*/
 		free(clean);
 		free(buffer);
 	}
@@ -291,7 +293,7 @@ unsigned HashJoin::getKeyColumn(char *a,string match)
 {
 	//cout <<"match "<<match << endl;
 	unsigned i,j,k,l;
-	i=j=k=1;
+	i=j=k=0;
 	l=99;
 	string buffer = "";
 	string aa;

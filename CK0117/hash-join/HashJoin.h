@@ -33,7 +33,7 @@ class HashJoin
 		int  getJoinColumn(char *,unsigned);
 		
 		
-		fpos_t jumpBrokenLine();
+		//fpos_t jumpBrokenLine();
 		
 		fpos_t getCleanHeader();
 
