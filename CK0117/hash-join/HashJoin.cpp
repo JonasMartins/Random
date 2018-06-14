@@ -8,6 +8,7 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<unistd.h>
+#include<stdexcept>
 #include"./HashJoin.h"
 
 using namespace std;
@@ -21,19 +22,8 @@ HashJoin::HashJoin(int argc, char ** argv)
 	generateAndFillBuckets();
 	readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
 
-
-	/*
-	generateAndFillBuckets();
-	string key = getCostumersKey(tuple);
-	string bin = getBinaryStringNumber(stoi(key));
- 	string pattern = getPattern(bin);	
-  unsigned index = getBucketIndex(pattern);
-	cout << bin << endl;
-	//cout << pattern << endl;
-	//cout << "Bucket: " << index << endl;
-	addToBuckets(index,tuple);
-	showBucketContent(index);
-	*/
+	// Mostrando todo o conteúdo de todos os buckets
+	showAllBucketsContent();
 }
 
 
@@ -120,43 +110,6 @@ string  HashJoin::numberToBinaryInvert(int number)
 	}
 	return v;
 }
-/*
-// Dentro dos arquivos gerados existe uma linha escrita ECHO est ativado.
-// essa linha quebra toda a logica de abrir o arquivo e ler a primaira linha
-// que contem o nome das colunas, esse método pula essa linha e retorna
-// a posição do ponteiro no inicio da verdadeira linha que lê o verdadeiro
-// cabeçalho do arquivo.
-fpos_t HashJoin::jumpBrokenLine()
-{
-
-	table1 = fopen(getTable1Name(),"rb+");
-	fpos_t pos;
-	char * buffer;
-	size_t result;
-	fgetpos(table1,&pos);
-	buffer = (char*)malloc(sizeof(char)*256);
- 	fread(buffer,1,256,table1);
- 	//cout << "buffer: \n"<<buffer << endl;
- 	char * clean;
- 	unsigned j=0;
-	unsigned i;
-	for(i=0;i<250;i++){
-		if(buffer[i]=='\n'){
-			j=i;
-			i=256;
-		}
-	}
-	clean  = (char*)malloc(sizeof(char)*j);
-	fsetpos(table1,&pos);
-	fread(clean,1,j,table1);
-	fgetpos(table1,&pos);
-	//cout<<"clean:\n"<<clean<<endl;
-	free(buffer);
-	free(clean);
-	fclose(table1);
-	return pos;
-}
-*/
 
 // Dentro do arquivo binário, após pular a primeira linha que contém
 // uma frase solta que quebraria a implementação do programa, existe uma
@@ -180,7 +133,7 @@ fpos_t  HashJoin::getCleanHeader()
  	//cout << "buffer:"<<buffer << endl;
 	for(i=50;i<250;i++){
  		if(buffer[i] == '\n'){
- 			j=i;
+ 			j=i+1;
  			i=256;
  		}
  	}
@@ -188,7 +141,7 @@ fpos_t  HashJoin::getCleanHeader()
 	fsetpos(table1,&pos);// setando novamente no inicio  da linha do buffer
 	fread(clean,1,j,table1);
 	fgetpos(table1,&pos);// setando o ponteiro no final da linha de cabeçalho
-	//cout << "clean: "<<clean << endl;
+	clean[j-1]='\0';
 	free(buffer);
 	unsigned index = getKeyColumn(clean,getColumn1Name());
 	if(index == 99){
@@ -215,33 +168,40 @@ void HashJoin::readCleanFileLine()
 	unsigned i,k,index;
 	table1 = fopen(getTable1Name(),"rb+");
 	
-	for(unsigned ii=0;ii<20;ii++)
+	for(unsigned ii=0;ii<40;ii++)
 	{
 		buffer = (char*)malloc(sizeof(char)*256);
 		fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
 	 	fread(buffer,1,256,table1);
  		//cout << "buffer:"<<buffer << endl;
-		for(i=50;i<250;i++){
+		for(i=20;i<250;i++){
  			if(buffer[i] == '\n'){
- 				j=i;
- 				i=256;
+ 				j=i+1;
+ 				i=250;
  			}
  		}
+
 		clean = (char*)malloc(sizeof(char)*j);
 		fsetpos(table1,&pos);// setando novamente no inicio  da linha do buffer
 		fread(clean,1,j,table1);
 		fgetpos(table1,&pos);// setando o ponteiro no final da linha de cabeçalho
-		//cout << "clean: "<< clean << endl;
+		clean[j-1]='\0';
+		// k é o inicio da string do atributo de junção.
 		k = getJoinColumnPosition(clean,getKey1Position());
+
+		// key é a string do atributo de junção.
 		key = getJoinColumn(clean,k);
-		cout<<key<<endl;
-		/*
+
+		//cout<<getKey1Position()<<endl;
+		
+		//cout<<key<<endl;
+		
 		bin = getBinaryStringNumber(key);
 		pattern = getPattern(bin);
 		index = getBucketIndex(pattern);
 		addToBuckets(index,clean);
-		showBucketContent(index);
-		*/
+		//cout <<clean<<endl;
+		//cout << clean[j];
 		free(clean);
 		free(buffer);
 	}
@@ -259,8 +219,8 @@ unsigned  HashJoin::getJoinColumnPosition(char * tuple,unsigned col)
 	string buffer = "";
  	string aux = "";
 	buffer.assign(tuple);	
-	for(unsigned i = 1;i<col;i++){
-		found = buffer.find(",");
+	for(unsigned i = 0;i<col;i++){
+		found = buffer.find(";");
 		sum+=(found+1);
 		aux = buffer;
 		buffer = aux.erase(0,found+1);
@@ -279,11 +239,19 @@ int  HashJoin::getJoinColumn(char * tuple,unsigned pos)
 	int ikey;
 	unsigned i=pos;
 	string key="";
-	while(tuple[i]!=','){
+	string aa;
+	//aa.assign(tuple);
+	//char last = aa[aa.length()-1];
+	while(tuple[i]!=';'/* || tuple[i]!=last*/){
 		key+=tuple[i];
 		i++;
 	}
-	ikey = stoi(key);
+	try{
+		ikey = stoi(key);
+	} catch(invalid_argument& e){
+		cout<<"A coluna passada não é do tipo int, erro."<<endl;
+		exit(1);
+	}
 	return ikey;
 }
 
@@ -298,9 +266,13 @@ unsigned HashJoin::getKeyColumn(char *a,string match)
 	string buffer = "";
 	string aa;
 	aa.assign(a);
+	char last = aa[aa.length()-1];
+	//cout << "last: "<<last<<endl;
 	//cout << "aa: " <<aa << endl;
 	while(j<aa.length()){
-		if(aa[j] == ','){
+		// para ficar mais eficiente, vamos assumir que a junção nunca é
+		// a ultima coluna
+		if(aa[j] == ';' /*|| aa[j] == last*/){
 			l=i;
 			i++;
 			//cout<<"cpm: "<<aa.substr(k,(j-k))<<endl;
@@ -313,7 +285,7 @@ unsigned HashJoin::getKeyColumn(char *a,string match)
 		}
 		j++;			
 	}
-	//cout<<l<<endl;
+	//cout<<"l: "<<l<<endl;
 	return l;
 }
 
@@ -390,7 +362,7 @@ bool HashJoin::addToBuckets(unsigned bucket,string number)
 		{
 			buckets[bucket][i] = number;
 			flag = true;
-			cout <<"Added!" << endl;		
+			//cout <<"Added!" << endl;		
 			i = 100;
 		}
 	}
@@ -416,6 +388,15 @@ string HashJoin::getCostumersKey(string tuple)
 string HashJoin::getPattern(string key)
 {
 	return key.substr(28,31);
+}
+
+// Mostrando todo o conteúdo de todos os buckets
+void HashJoin::showAllBucketsContent()
+{
+	unsigned i;
+	for(i=0;i<16;i++){
+		showBucketContent(i);
+	}
 }
 
 void HashJoin::showBucketContent(int index)

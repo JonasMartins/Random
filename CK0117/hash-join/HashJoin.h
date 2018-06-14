@@ -53,6 +53,7 @@ class HashJoin
 		void initializeBuckets();
 		void generateAndFillBuckets();
 		void showBucketContent(int);
+		void showAllBucketsContent();
 
 		unsigned getJoinColumnPosition(char *,unsigned);
 
