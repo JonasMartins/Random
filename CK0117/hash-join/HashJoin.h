@@ -28,10 +28,11 @@ class HashJoin
 		string numberToBinaryInvert(int);
 		string adjustBits(string);
 		string getCostumersKey(string);
-		string buckets[16][100];
+		string buckets[16][200];
 		string getPattern(string);
 		int  getJoinColumn(char *,unsigned);
 		
+		long getTable1Count();
 		
 		//fpos_t jumpBrokenLine();
 		
@@ -54,6 +55,8 @@ class HashJoin
 		void generateAndFillBuckets();
 		void showBucketContent(int);
 		void showAllBucketsContent();
+		
+		void readingTable2();
 
 		unsigned getJoinColumnPosition(char *,unsigned);
 

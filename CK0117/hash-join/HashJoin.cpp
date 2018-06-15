@@ -20,10 +20,14 @@ HashJoin::HashJoin(int argc, char ** argv)
 	// salvando o nome das tabelas passadas
 	setTableNames(argv);
 	generateAndFillBuckets();
-	readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
+	
+	//readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
+
+	
+	readingTable2();
 
 	// Mostrando todo o conteúdo de todos os buckets
-	showAllBucketsContent();
+	//showAllBucketsContent();
 }
 
 
@@ -168,7 +172,7 @@ void HashJoin::readCleanFileLine()
 	unsigned i,k,index;
 	table1 = fopen(getTable1Name(),"rb+");
 	
-	for(unsigned ii=0;ii<40;ii++)
+	for(unsigned ii=0;ii<1500;ii++)// 3000 limite...
 	{
 		buffer = (char*)malloc(sizeof(char)*256);
 		fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
@@ -199,7 +203,11 @@ void HashJoin::readCleanFileLine()
 		bin = getBinaryStringNumber(key);
 		pattern = getPattern(bin);
 		index = getBucketIndex(pattern);
-		addToBuckets(index,clean);
+		if(!addToBuckets(index,clean))
+		{
+			cout <<"Esouro de bucket, sem algoritimo de duplicamento ainda.."<<endl;
+			exit(1);
+		}
 		//cout <<clean<<endl;
 		//cout << clean[j];
 		free(clean);
@@ -356,14 +364,14 @@ unsigned HashJoin::getBucketIndex(string bucket)
 bool HashJoin::addToBuckets(unsigned bucket,string number)
 {
 	bool flag = false;
-	for(unsigned i=0;i<100;i++)
+	for(unsigned i=0;i<200;i++)
 	{
 		if(buckets[bucket][i].compare("") == 0)
 		{
 			buckets[bucket][i] = number;
 			flag = true;
 			//cout <<"Added!" << endl;		
-			i = 100;
+			i = 200;
 		}
 	}
 	return flag;
@@ -409,6 +417,99 @@ void HashJoin::showBucketContent(int index)
 		i++;
 	}
 }
+
+// Descobrindo quantas tuplas tem a tabela que será
+// ESSE MÉTODO NÃO SERÁ USADO, se fossemos armazenar orders 
+// em memŕia os bueckts teriam que ter 93.751 espaços de armazenamento
+// orders tem 1.500.001 tuplas
+long HashJoin::getTable1Count()
+{
+	long tuples = 0;
+	FILE * arq = fopen(getTable1Name(),"r");
+	int ch;
+	while(EOF != (ch=getc(arq)))
+	{
+		if('\n'==ch)
+			++tuples;
+	}
+	return tuples;
+}
+
+
+
+//	unsigned index = getKeyColumn(clean,getColumn2Name());
+
+
+void HashJoin::readingTable2()
+{
+	table2 = fopen(getTable2Name(),"rb+");
+	string bin,pattern;
+	string line="";
+	string header="";
+	char * lineChar;
+	unsigned ch,index,k,j;
+	int key;
+	unsigned i=0;
+	while('\n'!=ch)
+	{
+		ch=getc(table2);
+		header+=ch;
+	}
+	// tenho em index a posição do atributo de junção
+	// da segunda tabela;
+	index = getKeyColumn((char*)header.c_str(),getColumn2Name());
+	if(index == 99){
+		cout << "Coluna de junção não encontrada para essa tabela"<<endl;
+		exit(0);
+	}else {
+	 	key2Position = index;
+	}
+	
+	while(i<10)
+	{
+		ch=getc(table2);
+		line+=ch;
+		if('\n'==ch)
+		{
+			
+			++i;
+			
+			//cout<<line<<endl;
+			lineChar = (char*)line.c_str();
+			
+			// k é o inicio da string do atributo de junção.
+			k = getJoinColumnPosition(lineChar,getKey2Position());
+			
+			// key é a string do atributo de junção.
+			key = getJoinColumn(lineChar,k);
+			
+			bin = getBinaryStringNumber(key);
+			pattern = getPattern(bin);
+			j = getBucketIndex(pattern);
+			
+			cout<<key<<endl;
+			cout<<bin<<endl;
+			cout<<pattern<<endl;
+			cout<<j<<endl;
+
+			line.clear();
+		}
+	}
+	fclose(table2);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ================== GETTERS AND SETTERS
 
