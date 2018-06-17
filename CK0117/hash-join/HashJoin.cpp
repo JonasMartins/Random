@@ -4,7 +4,6 @@
 #include<math.h>
 #include<sstream>
 #include<string>
-#include<ctime>
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<unistd.h>
@@ -15,20 +14,22 @@ using namespace std;
 
 HashJoin::HashJoin(int argc, char ** argv)
 {
+
 	exceptionInputs(argc,argv);
 	
 	// salvando o nome das tabelas passadas
 	setTableNames(argv);
 	generateAndFillBuckets();
 	
-	//readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
-
+	readCleanFileLine(); // lendo as linhas da tabela e armazenando nos buckets
 	
-	readingTable2();
-
-	// Mostrando todo o conteúdo de todos os buckets
-	//showAllBucketsContent();
+	showAllBucketsContent();
+		
+	readSecondTable();
+	succesfullyOutput();
 }
+
+
 
 
 // Setando os nomes e os atributos de junção nas
@@ -171,8 +172,7 @@ void HashJoin::readCleanFileLine()
  	unsigned j=0;
 	unsigned i,k,index;
 	table1 = fopen(getTable1Name(),"rb+");
-	
-	for(unsigned ii=0;ii<1500;ii++)// 3000 limite...
+	for(unsigned ii=0;ii<7900;ii++)// 3000 limite...
 	{
 		buffer = (char*)malloc(sizeof(char)*256);
 		fsetpos(table1,&pos); // setando a posição depois de ter pulado a linha quebrada
@@ -184,7 +184,6 @@ void HashJoin::readCleanFileLine()
  				i=250;
  			}
  		}
-
 		clean = (char*)malloc(sizeof(char)*j);
 		fsetpos(table1,&pos);// setando novamente no inicio  da linha do buffer
 		fread(clean,1,j,table1);
@@ -194,12 +193,7 @@ void HashJoin::readCleanFileLine()
 		k = getJoinColumnPosition(clean,getKey1Position());
 
 		// key é a string do atributo de junção.
-		key = getJoinColumn(clean,k);
-
-		//cout<<getKey1Position()<<endl;
-		
-		//cout<<key<<endl;
-		
+		key = getJoinColumn(clean,k);		
 		bin = getBinaryStringNumber(key);
 		pattern = getPattern(bin);
 		index = getBucketIndex(pattern);
@@ -208,15 +202,11 @@ void HashJoin::readCleanFileLine()
 			cout <<"Esouro de bucket, sem algoritimo de duplicamento ainda.."<<endl;
 			exit(1);
 		}
-		//cout <<clean<<endl;
-		//cout << clean[j];
 		free(clean);
 		free(buffer);
 	}
 	fclose(table1);
 }
-
-
 // Pegando a posição inicial da  coluna de junção
 // na tupla recem lida da tabela que vai ser armazenada na memória.
 unsigned  HashJoin::getJoinColumnPosition(char * tuple,unsigned col)
@@ -238,7 +228,6 @@ unsigned  HashJoin::getJoinColumnPosition(char * tuple,unsigned col)
 	return pos;
 }
 
-
 // Recebe a posição inicial da coluna de junção, a tupla 
 // e lê os póximos caracteres até encontrar a virgula
 // pegando exatamente o valor do atributo de junção
@@ -247,9 +236,6 @@ int  HashJoin::getJoinColumn(char * tuple,unsigned pos)
 	int ikey;
 	unsigned i=pos;
 	string key="";
-	string aa;
-	//aa.assign(tuple);
-	//char last = aa[aa.length()-1];
 	while(tuple[i]!=';'/* || tuple[i]!=last*/){
 		key+=tuple[i];
 		i++;
@@ -275,15 +261,12 @@ unsigned HashJoin::getKeyColumn(char *a,string match)
 	string aa;
 	aa.assign(a);
 	char last = aa[aa.length()-1];
-	//cout << "last: "<<last<<endl;
-	//cout << "aa: " <<aa << endl;
 	while(j<aa.length()){
 		// para ficar mais eficiente, vamos assumir que a junção nunca é
 		// a ultima coluna
 		if(aa[j] == ';' /*|| aa[j] == last*/){
 			l=i;
 			i++;
-			//cout<<"cpm: "<<aa.substr(k,(j-k))<<endl;
 			if(match.compare(aa.substr(k,(j-k))) == 0){				
 				j=aa.length();
 			}else {
@@ -293,7 +276,6 @@ unsigned HashJoin::getKeyColumn(char *a,string match)
 		}
 		j++;			
 	}
-	//cout<<"l: "<<l<<endl;
 	return l;
 }
 
@@ -335,19 +317,24 @@ void HashJoin::generateAndFillBuckets()
 
 // inicializando o reconhecimento de bits
 // para ser adicionado as primeiras posições
-// da matriz de buckets 
+// da matriz de buckets, a ideia inicial era ter 16 buckets
+// mas ao testar a tabela orders, foi visto que a mesma não
+// tem no atributo de junção números que possam
+// aparecer na segunnda metade dos buckets, logo
+// para uma demonstração'é preferível economizar 
+// memória ao máximo.
 void HashJoin::initializeBuckets()
 {
-	string possibilities[16] = {
+	string possibilities[8] = {
 		 "0000","0001","0010","0011", 
-		 "0100","0101","0110","0111", 
+		 "0100","0101","0110","0111" /*, 
 		 "1000","1001","1010","1011",
-		 "1100","1101","1110","1111",	
+		 "1100","1101","1110","1111",	*/
 	};
-	for(unsigned i = 0;i<16;i++)
+	for(unsigned i = 0;i<8;i++)
 		buckets[i][0] = possibilities[i];
 	
-	for(unsigned i = 0;i<16;i++)
+	for(unsigned i = 0;i<8;i++)
 		bucketsIndex[possibilities[i]] = i;
 }
 
@@ -364,14 +351,13 @@ unsigned HashJoin::getBucketIndex(string bucket)
 bool HashJoin::addToBuckets(unsigned bucket,string number)
 {
 	bool flag = false;
-	for(unsigned i=0;i<200;i++)
+	for(unsigned i=0;i<1000;i++)
 	{
 		if(buckets[bucket][i].compare("") == 0)
 		{
 			buckets[bucket][i] = number;
 			flag = true;
-			//cout <<"Added!" << endl;		
-			i = 200;
+			i = 1000;
 		}
 	}
 	return flag;
@@ -402,20 +388,23 @@ string HashJoin::getPattern(string key)
 void HashJoin::showAllBucketsContent()
 {
 	unsigned i;
-	for(i=0;i<16;i++){
+	//cout<<"Conteúdo de todos os buckets com as tuplas da tabela menor:"<<endl;
+	for(i=0;i<8;i++){
 		showBucketContent(i);
 	}
 }
 
 void HashJoin::showBucketContent(int index)
 {
-	cout << "Conteúdo do bucket "<<index<<":"<<endl; 
+	//cout << "Conteúdo do bucket "<<index<<":"<<endl; 
 	unsigned i = 0;
 	while(buckets[index][i].compare("") != 0 )
 	{
-		cout << buckets[index][i] << endl;
+		//cout << buckets[index][i] << endl;
 		i++;
 	}
+	//cout<<"Posições ocupadas: "<<i<<endl;
+	bucketsLength[index] = i; // salvando o comprimento do bucket.
 }
 
 // Descobrindo quantas tuplas tem a tabela que será
@@ -435,28 +424,25 @@ long HashJoin::getTable1Count()
 	return tuples;
 }
 
-
-
-//	unsigned index = getKeyColumn(clean,getColumn2Name());
-
-
-void HashJoin::readingTable2()
+// Lendo a segunda tabela, comparando o atributo de
+// junção no bucket correspondente e escrevendo no arquivo
+// de saída.
+void HashJoin::readSecondTable()
 {
-	table2 = fopen(getTable2Name(),"rb+");
-	string bin,pattern;
-	string line="";
-	string header="";
-	char * lineChar;
-	unsigned ch,index,k,j;
 	int key;
-	unsigned i=0;
+	char * lineChar;
+	unsigned ch,index,k,j,i=0;
+	string bin,pattern,line="",header="";
+	table2 = fopen(getTable2Name(),"rb+");
+
+	FILE * arq = fopen("result.txt","w");
+
+	// Lendo o cabealho da segunda tabela
 	while('\n'!=ch)
 	{
 		ch=getc(table2);
 		header+=ch;
 	}
-	// tenho em index a posição do atributo de junção
-	// da segunda tabela;
 	index = getKeyColumn((char*)header.c_str(),getColumn2Name());
 	if(index == 99){
 		cout << "Coluna de junção não encontrada para essa tabela"<<endl;
@@ -464,52 +450,67 @@ void HashJoin::readingTable2()
 	}else {
 	 	key2Position = index;
 	}
-	
-	while(i<10)
+	while(i<10000)
 	{
 		ch=getc(table2);
 		line+=ch;
 		if('\n'==ch)
 		{
-			
 			++i;
-			
 			//cout<<line<<endl;
 			lineChar = (char*)line.c_str();
-			
 			// k é o inicio da string do atributo de junção.
 			k = getJoinColumnPosition(lineChar,getKey2Position());
-			
 			// key é a string do atributo de junção.
 			key = getJoinColumn(lineChar,k);
-			
 			bin = getBinaryStringNumber(key);
 			pattern = getPattern(bin);
 			j = getBucketIndex(pattern);
-			
-			cout<<key<<endl;
-			cout<<bin<<endl;
-			cout<<pattern<<endl;
-			cout<<j<<endl;
+			compareKeyBucket(arq,j,lineChar,key);
 
 			line.clear();
 		}
 	}
 	fclose(table2);
+	fclose(arq);
 }
 
+// passar a coluna, o indice do bucket e o atributo de junção 
+// dentro do bucket correspondente
+void HashJoin::compareKeyBucket(FILE * file, unsigned id,char * line,int key)
+{
+	
+	int kkey;
+	string buffer;
+	char * char_buffer;
+	unsigned index,k,j,i=1;
+	// precorre o bucket para ver se encontra, se sim
+	// sai do loop, pior caso, percorre as 1000 posições.
+	while(i<bucketsLength[id])
+	{
+		buffer = buckets[id][i];
+		char_buffer = (char*)buffer.c_str();
+		k = getJoinColumnPosition(char_buffer,getKey1Position());		
+		kkey = getJoinColumn(char_buffer,k);
+		if(kkey==key){
+			fprintf(file,"%s",line);
+			fprintf(file,"%s",char_buffer);
+			//cout<<kkey<<endl;
+			i=bucketsLength[id];
+		}
 
+		i++;
+	}
+} 
 
-
-
-
-
-
-
-
-
-
-
+void HashJoin::succesfullyOutput()
+{
+	cout<<"Esse programa executou a seguinte consulta: "<<endl;
+	cout<<"SELECT *"<<endl;
+	cout<<"FROM "<<getTable1Name()<<","<<endl;
+	cout<<getTable2Name()<<endl;
+	cout<<"WHERE "<<getColumn1Name()<<" = "<<getColumn2Name()<<" LIMIT 8000;"<<endl;
+}
 
 // ================== GETTERS AND SETTERS
 

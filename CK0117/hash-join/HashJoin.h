@@ -10,61 +10,62 @@ class HashJoin
 	public:
 
 		HashJoin(int, char **);
-		string getBinaryStringNumber(int);
 		
-		unsigned getKeyColumn(char *,string);
-		unsigned getBucketIndex(string);
+		string getBinaryStringNumber(int);
 		
 		char * getTable1Name();
 		char * getTable2Name();
-		
 		char * getColumn1Name();
 		char * getColumn2Name();
 	
 		unsigned getKey1Position();
 		unsigned getKey2Position();
+		unsigned getBucketIndex(string);
+		unsigned getKeyColumn(char *,string);
 
 	private:
-		string numberToBinaryInvert(int);
+
+		string buckets[8][1000];
 		string adjustBits(string);
-		string getCostumersKey(string);
-		string buckets[16][200];
 		string getPattern(string);
-		int  getJoinColumn(char *,unsigned);
-		
+		string getCostumersKey(string);
+		string numberToBinaryInvert(int);
+
 		long getTable1Count();
 		
-		//fpos_t jumpBrokenLine();
 		
 		fpos_t getCleanHeader();
 
 
-		map<string,unsigned> bucketsIndex;
-	
-
-		void setTableNames(char **);
+		void succesfullyOutput();
 		void readCleanFileLine();
+		void setTableNames(char **);
+		void compareKeyBucket(FILE * ,unsigned,char *,int);
 
+		map<string,unsigned> bucketsIndex;
 
 		bool readKeys(char **);
 		bool readTables(char **);
 		bool addToBuckets(unsigned,string);
 
-		void exceptionInputs(int, char **);
+		void readSecondTable();
 		void initializeBuckets();
-		void generateAndFillBuckets();
 		void showBucketContent(int);
 		void showAllBucketsContent();
+		void generateAndFillBuckets();
+		void exceptionInputs(int, char **);
 		
-		void readingTable2();
 
+		int  getJoinColumn(char *,unsigned);
+	
 		unsigned getJoinColumnPosition(char *,unsigned);
-
 
 		// ====================== VARIÁVEIS
 		
 		unsigned key1Position;
 		unsigned key2Position;
+		unsigned bucketsLength[8];
+		
 		char * key1;
 		char * key2;
 		char * table1Name;
